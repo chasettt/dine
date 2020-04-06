@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>{$store_name}</title>
+        <meta charset=utf-8>
+        <meta name=description content="">
+        <meta name=viewport content="width=device-width, initial-scale=1,user-scalable=no">        
+        <link rel="stylesheet" type="text/css" href="{$Think.config.domain.resource_url}/static/resource/online/css/commen.css?v={$Think.config.release_version}">
+        <link rel="stylesheet" type="text/css" href="{$Think.config.domain.resource_url}/static/resource/online/css/reset.css?v={$Think.config.release_version}">
+        <link rel="stylesheet" type="text/css" href="{$Think.config.domain.resource_url}/static/resource/online/css/clearTable.css?v={$Think.config.release_version}">        
+        <script src="{$Think.config.domain.resource_url}/static/resource/online/scripts/jquery.min.js?v={$Think.config.release_version}"></script>
+        <script src="{$Think.config.domain.resource_url}/static/resource/online/scripts/wyrem.js?v={$Think.config.release_version}"></script>
+    </head>
+    <body>
+        <div class="clearTable_container">
+            <div class="bg">
+              <div class="num"></div>
+            </div>
+            <div class="text_container">
+                <p>抱歉，当前桌台还没有清台</p>
+                <p>请联系服务员清台，然后再扫码下单</p>
+            </div>
+            <div class="btns">我知道了</div>
+        </div>
+        <!-- 屏幕横竖提醒start-->
+        <div id="orientLayer" class="mod-orient-layer">
+            <div class="mod-orient-layer__content">
+                <i class="icon mod-orient-layer__icon-orient"></i>
+                <div class="mod-orient-layer__desc">为了更好的体验，请使用竖屏浏览</div>
+            </div>
+        </div>
+        <!-- 屏幕横竖提醒start-->
+        <script src="{$Think.config.domain.resource_url}/static/resource/online/js/common/utils.js?v={$Think.config.release_version}"></script>
+        <script type="text/javascript">
+            var storeId = Util.getUrlParam('store_id');
+            var tableNo = Util.getUrlParam('table_no');
+            $('div.num').text(tableNo);
+            $('.btns').click(function(){
+                var url = window.location.origin + '/online/reserve?store_id=' + storeId +'&from=reserve'
+                window.location.href = url;
+            });
+        </script>
+    </body>
+</html>

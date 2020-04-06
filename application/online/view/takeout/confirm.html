@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>下单确认页</title>
+<meta charset=utf-8>
+<meta name=description content="">
+<meta name=viewport content="width=device-width, initial-scale=1,user-scalable=no">
+<link rel="stylesheet" type="text/css" href="{$Think.config.domain.resource_url}/static/resource/online/css/reset.css?v={$Think.config.release_version}">
+<link rel="stylesheet" href="{$Think.config.domain.resource_url}/static/resource/takeout/css/commen.css?v={$Think.config.release_version}"/>
+<link rel="stylesheet" href="{$Think.config.domain.resource_url}/static/resource/takeout/css/index.css?v={$Think.config.release_version}"/>
+<link rel="stylesheet" href="{$Think.config.domain.resource_url}/static/resource/takeout/css/orderDefine.css?v={$Think.config.release_version}"/>
+<link rel="stylesheet" href="{$Think.config.domain.resource_url}/static/resource/takeout/css/takeOutDefine.css?v={$Think.config.release_version}" />
+<script src="{$Think.config.domain.resource_url}/static/resource/online/scripts/jquery.min.js?v={$Think.config.release_version}"></script>
+<script src="{$Think.config.domain.resource_url}/static/resource/online/scripts/wyrem.js?v={$Think.config.release_version}"></script>
+<script src="{$Think.config.domain.resource_url}/static/resource/online/scripts/jquery.cookie.js?v={$Think.config.release_version}"></script>
+    <style>
+    	body{
+    		background: #D31E20;
+    	}
+    	.pager{
+    		width:7.2rem;min-height:100vh;margin:0.15rem auto 0;background:#fff;
+    	}
+        .ui-flutter {position: absolute; color: #E94F06}
+        .scllor_m{overflow-y:scroll;-webkit-overflow-scrolling: touch;height:calc(100vh - 1.5rem);}
+    </style>
+</head>
+<body>
+<div class="clear pager">
+	<div class="clear scllor_m">
+		<div class="orderDefine-content takeOutDetail">
+		    <div class="orderDefine-header header">
+		    	<div class="area"></div>
+		    	<p class="shop_name">{$store_name}</p>
+		    	<p class="address">{$store_address}</p>
+		    	<p class="linerl"></p>
+		    </div>
+		    <div class="inform">
+		  		<dl class="dll clear">
+		  			<dt>取餐人名：</dt>
+		  			<dd>
+		  				<input type="text" id="name" value="" placeholder="填写取餐人名">
+		  			</dd>
+		  		</dl>
+		  		<dl class="dll clear">
+		  			<dt>取餐电话：</dt>
+		  			<dd>
+		  				<input type="tel" id="tel" value="" placeholder="填写取餐电话">
+		  			</dd>
+		  		</dl>
+
+				<!-- 订单备注 -->
+				<div class="items J-btn-order-remark">
+					<div class="name">订单备注</div>
+					<div class="selects J-btn-order-remark">
+						<span class="tips" style="display: none;">亲，你有什么忌口请告诉我们</span>
+						<span class="J-order-text J-order-remark" style="display: none;"></span>
+						<div class="arrow_box">
+							<div class="arrow_box_icon"></div>
+						</div>
+					</div>
+				</div>
+		    </div>
+			<!-- 菜品列表 -->
+		    <div class="orderDefinelist-box">
+		        <div class="orderDefinelist-items J-foodlist">
+		            <div class="dish-content">
+		                <span>已选菜品</span>
+		                <p class="line"></p>
+		            </div>
+					<div class="cartList"></div>
+		       	</div>
+		     </div>
+		</div>
+	</div>
+</div>
+
+<!--底部按钮start-->
+<div class="footer-menu takeOutDetail-footer" style="display:block;">
+    <div class="footer-menu-disk-r">
+        <div class="footer-menu-disk-txt" id="totalPrice">¥</div>
+        <div class="footer_btn_content">
+        	<div class="liner"></div>
+            <div class="footer_btn_content_left">加菜</div>
+            <div class="footer_btn_content_right" id="checkout">下单</div>
+        </div>
+    </div><!--
+    <div class="footer-menu-diskContent">
+        <div class="footer-menu-disk-img"></div>
+    </div>-->
+    
+    <!--小人出现 start-->
+    <div class="footer-menu-diskContent">
+    	<div class="t">+1</div>
+    	<div class="l"></div>
+    	<div class="footer-menu-disk-img"></div>
+    	<div class="r"></div>
+    </div>
+    <!--小人出现 end-->
+    
+    <div class="icon-number J-cart-total-count"><span>1</span></div>
+</div>
+
+<!-- 提示框 -->
+<div class="publicOpenwindow-bg" id="confirmDialog" style="display: none;">
+	<div class="publicOpenwindow">
+		<div class="publicOpenwindow-img"></div>
+
+		<!--原有的结构 开始-->
+		<div class="publicOpenwindow-minicontent hide" id="confirmBox">
+			<div class="publicOpenwindow-minicontent-txt">请吃完再结账，别着急！</div>
+			<div class="publicOpenwindow-minicontent-btns">
+				<input type="button" class="button publicOpenwindow-minicontent-btns-l" value="我知道了">
+				<input type="button" class="button publicOpenwindow-minicontent-btns-r" value="继续结账">
+			</div>
+		</div>
+		<!--原有的结构 结束-->
+		<!--新加入的 开始-->
+		<div class="publicOpenwindow-minicontent comoot">
+			<p class="p1">卖完啦！</p>
+			<p class="p2">抱歉，您点的以下菜品卖完了：</p>
+			<p class="p3"></p>
+			<div class="few">
+				<span class="btnc">换别的菜尝尝</span>
+			</div>
+		</div>
+		<!--新加入的 结束-->
+	</div>
+</div>
+
+<!--提示框-->
+<div class="ui-tips"></div>
+
+<!-- 自由配弹框 -->
+<div class="mask-free J-combo-pop">
+	<div class="layout-free">
+		<div class="f-top">
+			<img src="" />
+			<div class="f-top-txt">
+				<h4 class="J-combo-name"></h4>
+				<p class="J-combo-desc"></p>
+			</div>
+			<div class="f-btn-exit"></div>
+		</div>
+		<!-- 内容区域 -->
+		<div class="layout-content">
+			<!-- 标题 -->
+			<div class="f-title">
+				<p>套餐详情</p>
+				<span></span>
+			</div>
+			<div class="f-dialog J-combo-main">
+
+			</div>
+			<div class="J-combo-select J-combo-vice">
+
+			</div>
+		</div>
+		<div class="btn-join-plate">
+			<div class="p-left J-combo-price">¥</div>
+			<div class="p-right J-combo-confirm">加入餐盘</div>
+		</div>
+	</div>
+</div>
+<!-- end 自由配弹框 -->
+
+
+<!--&lt;!&ndash; 弹框1 &ndash;&gt;-->
+<!--<div class="mask-public single-click J-single-weigh">-->
+	<!--<div class="layout-public">-->
+		<!--<div class="wx-tips"></div>-->
+		<!--<div class="txt-area">该门店暂不支持自助下单称重菜，请及时联系服务员点餐下单</div>-->
+		<!--<div class="click-group">-->
+			<!--<div class="btn-know J-known-close">我知道了</div>-->
+		<!--</div>-->
+	<!--</div>-->
+<!--</div>-->
+
+<!--&lt;!&ndash; 弹框2 &ndash;&gt;-->
+<!--<div class="mask-public double-click J-double-weigh">-->
+	<!--<div class="layout-public">-->
+		<!--<div class="wx-tips"></div>-->
+		<!--<div class="txt-area">您点的菜品包含称重菜，下单后，请及时联系服务员称重哦～</div>-->
+		<!--<div class="click-group">-->
+			<!--<div class="btn-continue J-weigh-order">确认下单</div>-->
+			<!--<span></span>-->
+			<!--<div class="btn-know J-known-close">我知道了</div>-->
+		<!--</div>-->
+	<!--</div>-->
+<!--</div>-->
+
+</body>
+<script src="//res.wx.qq.com/open/js/jweixin-1.1.0.js?v={$Think.config.release_version}"></script>
+<script src="{$Think.config.domain.resource_url}/static/resource/online/scripts/jquery.cookie.js?v={$Think.config.release_version}"></script>
+<script src="{$Think.config.domain.resource_url}/static/resource/online/scripts/jquery.lazyload.js?v={$Think.config.release_version}"></script>
+<script src="{$Think.config.domain.resource_url}/static/resource/online/scripts/swiper-3.4.2.jquery.min.js?v={$Think.config.release_version}"></script>
+<script src="{$Think.config.domain.resource_url}/static/resource/online/scripts/jquery.fly.min.js?v={$Think.config.release_version}"></script>
+<script src="{$Think.config.domain.resource_url}/static/resource/online/js/common/utils.js?v={$Think.config.release_version}"></script>
+<script src="{$Think.config.domain.resource_url}/static/resource/online/js/common/config.js?v={$Think.config.release_version}"></script>
+<script src="{$Think.config.domain.resource_url}/static/resource/online/js/common/factory.js?v={$Think.config.release_version}"></script>
+<script src="{$Think.config.domain.resource_url}/static/resource/online/js/common/common.js?v={$Think.config.release_version}"></script>
+<script src="{$Think.config.domain.resource_url}/static/resource/online/js/model/store.js?v={$Think.config.release_version}"></script>
+<script src="{$Think.config.domain.resource_url}/static/resource/online/js/model/user.js?v={$Think.config.release_version}"></script>
+<script src="{$Think.config.domain.resource_url}/static/resource/online/js/model/food.js?v={$Think.config.release_version}"></script>
+<script src="{$Think.config.domain.resource_url}/static/resource/online/js/model/order.js?v={$Think.config.release_version}"></script>
+<script src="{$Think.config.domain.resource_url}/static/resource/online/js/model/packing.js?v={$Think.config.release_version}"></script>
+<script src="{$Think.config.domain.resource_url}/static/resource/online/js/controller/confirm_takeout.js?v={$Think.config.release_version}"></script>
+<script src="{$Think.config.domain.resource_url}/static/resource/online/scripts/iscroll.js?v={$Think.config.release_version}"></script>
+<script src="{$Think.config.domain.resource_url}/static/resource/online/scripts/navbarscroll.js?v={$Think.config.release_version}"></script>
+</html>
+<script>
+    var order_sn=Util.getUrlParam('order_sn');
+    var store_id = Util.getUrlParam('store_id');
+    indexController.init(store_id);
+</script>

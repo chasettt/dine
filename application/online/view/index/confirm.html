@@ -1,0 +1,424 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset=utf-8>
+    <meta name=description content="">
+    <meta name=viewport content="width=device-width, initial-scale=1,user-scalable=no">
+    <title>下单确认页</title>
+    <link rel="stylesheet" type="text/css" href="{$Think.config.domain.resource_url}/static/resource/online/css/commen.css?v={$Think.config.release_version}">
+    <link rel="stylesheet" type="text/css" href="{$Think.config.domain.resource_url}/static/resource/online/css/reset.css?v={$Think.config.release_version}">
+    <link rel="stylesheet" type="text/css" href="{$Think.config.domain.resource_url}/static/resource/online/css/orderDefine.css?v={$Think.config.release_version}">
+    <link rel="stylesheet" type="text/css" href="{$Think.config.domain.resource_url}/static/resource/online/css/index.css?v={$Think.config.release_version}">
+    <link rel="stylesheet" type="text/css" href="{$Think.config.domain.resource_url}/static/resource/online/css/pullMenuFail.css?v={$Think.config.release_version}">
+    <script src="{$Think.config.domain.resource_url}/static/resource/online/scripts/jquery.min.js?v={$Think.config.release_version}"></script>
+    <script src="{$Think.config.domain.resource_url}/static/resource/online/scripts/wyrem.js?v={$Think.config.release_version}"></script>
+    <style>
+    	body{
+    		background: #D31E20;
+    	}
+    	.pager{
+    		width:7.2rem;min-height:100vh;margin:0.15rem auto 0;background:#fff;
+    	}
+		.free-dish-list{
+			position: relative;
+			top: 0;
+		}
+		.free-dish-list .free-dialog{
+			width: 5.6rem;
+		}
+    </style>
+</head>
+<body>
+<div class="clear pager">
+	<div class="orderDefine-content J-confirm-page" style="display: block;">
+	    <div class="header">
+	        <div class="bg">
+	        	
+	        	<!--桌号加横线 start-->
+	        	<div class="numLiner">
+	            	<div class="numLef">
+	            		<div class="line"></div>
+	            	</div>
+	            	<p class="tab-num">桌号</p>   
+	            	<div class="numRig">
+	            		<div class="line"></div>   
+	            	</div>
+	            </div>
+	            <!--桌号加横线 end-->
+	            
+	            <div class="text J-table-name"></div>
+	        </div>
+	        <div class="xian"></div>
+	    </div>
+	    
+	    <!--新页面稿中增加的 start-->
+	    <!--<div class="inform">-->
+	  		<!--<dl class="dll clear">-->
+	  			<!--<dt>用餐人数：</dt>-->
+	  			<!--<dd>-->
+	  				<!--<input type="tel" id="" value="" placeholder="请选择">-->
+	  				<!--<span class="arr-rig"></span>-->
+	  			<!--</dd>-->
+	  		<!--</dl>-->
+	  		<!--<dl class="dll clear">-->
+	  			<!--<dt>订单备注：</dt>-->
+	  			<!--<dd>-->
+	  				<!--<div class="tips">亲，你有什么忌口请告诉我们</div>-->
+	  				<!--<div class="msg hide">不要辣，不要甜，好东西，带过来</div>-->
+	  				<!--<span class="arr-rig"></span>-->
+	  			<!--</dd>-->
+	  		<!--</dl>-->
+	    <!--</div>-->
+	    <!--新页面稿中增加的 end-->
+
+		<div class="order_fine_other_info J-other" style="display: block;">
+			<!--选择人数-->
+			<div class="items J-select-people-num">
+				<div class="name">用餐人数</div>
+				<div class="selects">
+					<div class="qing J-people-num">请选择</div>
+					<div class="arrow_box">
+						<div class="arrow_box_icon"></div>
+					</div>
+				</div>
+			</div>
+			<!--订单备注-->
+			<div class="items J-btn-order-remark">
+				<div class="name">订单备注</div>
+				<div class="selects">
+					<div class="tips hide">亲，你有什么忌口请告诉我们</div>
+					<span class="J-order-text J-order-remark hide">口味等要求</span>
+					<div class="arrow_box">
+						<div class="arrow_box_icon"></div>
+					</div>
+				</div>
+			</div>
+		</div>
+	    
+	    <div class="main_content">
+	        <div class="user_boxs"></div>
+	    </div>
+	    <div class="footer-menu index_plate_flash" style="display:block;">
+	    	<!--增加提示内容 first-->
+	        <div class="msgs">
+	            <p class="zhu">恭喜<label>你</label>，获微信下单<span class="hao">抢豪礼</span>的机会！</p>
+	            <p class="zhu">再加<span class="hao"></span>，每桌有1次<span class="hao">抢豪礼</span>的机会！</p>
+	            <p class="zhu">活动期间，微信下单<span class="hao">抢豪礼</span>啦！</p>
+	        </div>
+	        <!--增加提示内容 end-->
+	    	
+	        <div class="footer-menu-disk-r">
+	            <div class="footer-menu-disk-txt">已选<span class="J-food-total"></span>个菜</div>
+	            <div class="footer_btn_content">
+	            	<div class="xian"></div>
+	                <div class="footer_btn_content_left J-btn-addfood">加菜</div>
+	                <div class="footer_btn_content_right J-btn-order">下单</div>
+	            </div>
+	        </div>
+
+			<div class="footer-menu-diskContent J-btn-cart">
+				<div class="t">+1</div>
+				<div class="l"></div>
+				<div class="footer-menu-disk-img">
+					<div class="texts J-cart-people-num">1</div>
+				</div>
+				<div class="r"></div>
+			</div>
+
+	        <div class="icon-number J-cart-total" style="display: none;">
+	            <span>0</span>
+	        </div>       
+	    </div>
+	
+	    <!--提示框-->
+	    <div class="ui-tips"></div>
+	    <!--加载框-->
+	    <div id="loadingToast" style="display: none;">
+	        <div class="ui-mask_transparent"></div>
+	        <div class="ui-toast">
+	            <i class="ui-loading"></i>
+	        </div>
+	    </div>
+	
+	    <!-- 定位错误页面 -->
+	    <div class="pullMenuFail-container J-page-error" style="position: absolute;left: 0; top: 0;display: none; z-index: 4000;">
+	        <div class="pullMenuFail-statusimg">
+	            <div class="pullMenuFail-img"></div>
+	        </div>
+	        <div class="pullMenuFail-watingtxt">
+	            <p class="J-page-error-content"></p>
+	        </div>
+	        <div class="pullMenuFail-tips" onClick="window.location.reload();">重新定位</div>
+	    </div>
+	
+	    <!-- 屏幕横竖提醒start-->
+	    <div id="orientLayer" class="mod-orient-layer">
+	        <div class="mod-orient-layer__content">
+	            <i class="icon mod-orient-layer__icon-orient"></i>
+	            <div class="mod-orient-layer__desc">为了更好的体验，请使用竖屏浏览</div>
+	        </div>
+	    </div>
+	    <!-- 屏幕横竖提醒end-->
+	</div>
+</div>
+
+<!--菜品备注弹出层 2019,5,18 start-->
+<div class="remark_innerPage_bg" id="" style="display:none;"> 
+	<div class="dishes-remark-box">		
+		
+		<!--以下是原来的结构-->
+		<!--
+		<div class="mt_point_rel">
+			<div class="point_l"></div>    	
+			<div class="order_remark_title">菜品备注</div>     
+			<div class="point_r"></div>   
+		</div> 
+		
+		<div class="foodcontent-dibumark-detail-beizhu">        
+			<textarea style="width:5.6rem;height:1.24rem;" class="J-remark-input" placeholder="选择忌口备注或自己手动填写">				
+			</textarea>
+			<ul class="J-remark-button clear"> 
+				<li class="J-remark-text">
+					<a href="javascript:void(0)">不辣</a>
+					<a href="javascript:void(0)">微辣</a>
+					<a href="javascript:void(0)">中辣</a> 
+				</li>
+			</ul>
+			<ol class="J-remark-button clear">
+				<li class="J-remark-text"><a href="javascript:void(0)">免葱</a></li>
+				<li class="J-remark-text"><a href="javascript:void(0)">免蒜</a></li>
+				<li class="J-remark-text"><a href="javascript:void(0)">免香菜</a></li>
+				<li class="J-remark-text"><a href="javascript:void(0)">免姜</a></li>
+			</ol>    
+		</div>-->
+			
+		<div class="rel-a">
+			<div class="del"></div>
+			<div class="remark-tip">
+				<p class="title">菜品备注</p>
+			</div>			
+			<div class="content-detail">
+				<div class="inf"><h6 class="cai">[<span class="name">黄米凉糕</span>]</h6><span class="title">菜品备注:</span></div>
+				<div class="text-a">
+					<textarea class="J-remark-input" placeholder="请输入口味、偏好等要求"></textarea>
+					<div class="num"><span class="shu">0</span>/50</div>
+				</div>				
+				<div class="special-button">
+					<p class="biao">快捷标签</p>
+					<ul class="clear ull-a">
+						<li class="active">不吃辣</li>
+						<li>微辣</li>
+						<li>特辣</li>
+					</ul>
+					<ul class="clear ull-a">
+						<li>加热</li>
+						<li>常温</li>
+					</ul>
+					<ul class="clear ull-b">
+						<li class="active">不吃葱</li>
+						<li>免香菜</li>
+						<li>不吃蒜</li>
+					</ul>
+					</ul>
+				</div>
+		    </div>			
+			<dl class="clear remark-dll">	
+				<dd class="J-remark-cancel">没有忌口</dd>	
+				<dd class="J-remark-confirm">确定忌口</dd>
+			</dl>			
+		</div>		
+		 
+	</div>
+</div>
+<!--菜品备注弹出层  2019,5,18 end-->
+
+<!--订单备注弹出层 2019,5,18 start-->
+<div class="remark_innerPage_bg" id="" style="display:none;"> 
+	<div class="dishes-remark-box">					
+		<div class="rel-a">
+			<div class="del"></div>
+			<div class="remark-tip">
+				<p class="title">订单备注</p>
+			</div>			
+			<div class="content-detail">
+				<div class="ino">欢迎使用自助点餐服务，你有什么忌口吗？</div>
+				<div class="text-a">
+					<textarea class="J-remark-input" placeholder="请输入口味、偏好等要求"></textarea>
+					<div class="num"><span class="shu">0</span>/50</div>
+				</div>				
+				<div class="special-button">
+					<p class="biao">快捷标签</p>
+					<ul class="clear ull-a">
+						<li class="active">不吃辣</li>
+						<li>微辣</li>
+						<li>特辣</li>
+					</ul>
+					<ul class="clear ull-a">
+						<li>加热</li>
+						<li>常温</li>
+					</ul>
+					<ul class="clear ull-b">
+						<li class="active">不吃葱</li>
+						<li>免香菜</li>
+						<li>不吃蒜</li>
+					</ul>
+					</ul>
+				</div>
+			</div>
+			<dl class="clear remark-dll">	
+				<dd class="J-remark-cancel">没有忌口</dd>	
+				<dd class="J-remark-confirm">确定忌口</dd>
+			</dl>
+		</div>				 
+	</div>
+</div>
+<!--订单备注弹出层  2019,5,18 end-->
+
+<!--选择用餐人数是在下单确认页这个老弹出框里调整的 start-->
+<div class="orderlist-eatnum-bg" id="" style="display:none;">    
+	<div class="orderlist-eatnum-inner">
+		<div class="rel-a">
+			<div class="xibei-log"></div>
+			<div class="top-bu">
+				<div class="orderlist-remark-windowtitle">成人用餐人数</div>        
+				<ul class="orderlist-remark-windowkeyboard orderlist-eatnum">            
+					<li><a href="javascript:;">1</a></li>            
+					<li><a href="javascript:;">2</a></li>            
+					<li><a href="javascript:;">3</a></li>            
+					<li><a href="javascript:;">4</a></li>            
+					<li><a href="javascript:;">5</a></li>            
+					<li><a href="javascript:;">6</a></li>            
+					<li><a href="javascript:;">7</a></li>            
+					<li><a href="javascript:;">8</a></li>            
+					<li><a href="javascript:;">9</a></li>            
+					<li><a href="javascript:;">10</a></li>        
+				</ul>			
+				<div class="orderlist-remark-windowtitle">儿童用餐人数<span>(8岁以下)</span></div>			
+				<ul class="orderlist-remark-windowkeyboard children_num orderlist-eatnum">				
+					<li><a href="javascript:;">1</a></li>				
+					<li><a href="javascript:;">2</a></li>				
+					<li><a href="javascript:;">3</a></li>				
+					<li><a href="javascript:;">4</a></li>				
+					<li><a href="javascript:;">5</a></li>
+				    <li><a href="javascript:;">6</a></li>	
+				</ul>
+				<div class="btn">确认</div>
+			</div>			
+		</div>
+	</div>
+</div>
+<!--选择用餐人数是在下单确认页这个老弹出框里调整的 end-->
+
+<!-- 自由配弹框 -->
+<div class="mask-free J-combo-pop">
+	<div class="layout-free">
+		<div class="f-top">
+			<img src="" />
+			<div class="f-top-txt">
+				<h4 class="J-combo-name"></h4>
+				<p class="J-combo-desc"></p>
+			</div>
+			<div class="f-btn-exit"></div>
+		</div>
+		<!-- 内容区域 -->
+		<div class="layout-content">
+			<!-- 标题 -->
+			<div class="f-title">
+				<p>套餐详情</p>
+				<span></span>
+			</div>
+			<div class="f-dialog J-combo-main">
+			
+			</div>
+			<div class="J-combo-select J-combo-vice">
+			
+			</div>
+		</div>
+		<div class="btn-join-plate">
+			<div class="p-left J-combo-price">¥</div>
+			<div class="p-right J-combo-confirm">加入餐盘</div>
+		</div>
+	</div>
+</div>
+<!-- end 自由配弹框 -->
+
+<!-- 弹框1 -->
+<div class="mask-public single-click J-single-soldout">
+	<div class="layout-public">
+		<div class="wx-tips"></div>
+		<div class="txt-area"></div>
+		<div class="click-group">
+			<div class="btn-know J-change-dish">换别的菜尝尝</div>
+		</div>
+	</div>
+</div>
+
+<!-- 弹框1 -->
+<div class="mask-public single-click J-single-known">
+	<div class="layout-public">
+		<div class="wx-tips"></div>
+		<div class="txt-area"></div>
+		<div class="click-group">
+			<div class="btn-know J-known-close">我知道了</div>
+		</div>
+	</div>
+</div>
+
+<!-- 弹框1 -->
+<div class="mask-public single-click J-single-weigh">
+	<div class="layout-public">
+		<div class="wx-tips"></div>
+		<div class="txt-area">该门店暂不支持自助下单称重菜，请联系服务员点餐下单</div>
+		<div class="click-group">
+			<div class="btn-know J-known-close">我知道了</div>
+		</div>
+	</div>
+</div>
+
+<!-- 弹框2 -->
+<div class="mask-public double-click J-double-weigh">
+	<div class="layout-public">
+		<div class="wx-tips"></div>
+		<div class="txt-area">您点的菜品包含称重菜(如蒙古牛大骨)，下单后，请联系服务员称重哦～</div>
+		<div class="click-group">
+			<div class="btn-continue J-weigh-order">确认下单</div>
+			<span></span>
+			<div class="btn-know J-known-close">我知道了</div>
+		</div>
+	</div>
+</div>
+
+<!-- 弹框2 -->
+<div class="mask-public double-click">
+	<div class="layout-public">
+		<div class="wx-tips"></div>
+		<div class="txt-area">小伙伴已点过西贝面筋啦， 还要继续添加吗？</div>
+		<div class="click-group">
+			<div class="btn-continue">继续结账</div>
+			<span></span>
+			<div class="btn-know J-known-close">我知道了</div>
+		</div>
+	</div>
+</div>
+
+<script src="//webapi.amap.com/maps?v=1.3&key=bdd9e8e4a83eb6414c0b362dfc883062"></script>
+<script src="//res.wx.qq.com/open/js/jweixin-1.1.0.js?v={$Think.config.release_version}"></script>
+<script src="{$Think.config.domain.resource_url}/static/resource/online/scripts/jquery.cookie.js?v={$Think.config.release_version}"></script>
+<script src="{$Think.config.domain.resource_url}/static/resource/online/js/common/utils.js?v={$Think.config.release_version}"></script>
+<script src="{$Think.config.domain.resource_url}/static/resource/online/js/common/config.js?v={$Think.config.release_version}"></script>
+<script src="{$Think.config.domain.resource_url}/static/resource/online/js/common/factory.js?v={$Think.config.release_version}"></script>
+<script src="{$Think.config.domain.resource_url}/static/resource/online/js/common/common.js?v={$Think.config.release_version}"></script>
+<script src="{$Think.config.domain.resource_url}/static/resource/online/js/model/user.js?v={$Think.config.release_version}"></script>
+<script src="{$Think.config.domain.resource_url}/static/resource/online/js/model/food.js?v={$Think.config.release_version}"></script>
+<script src="{$Think.config.domain.resource_url}/static/resource/online/js/model/store.js?v={$Think.config.release_version}"></script>
+<script src="{$Think.config.domain.resource_url}/static/resource/online/js/model/table.js?v={$Think.config.release_version}"></script>
+<script src="{$Think.config.domain.resource_url}/static/resource/online/js/model/order.js?v={$Think.config.release_version}"></script>
+<script src="{$Think.config.domain.resource_url}/static/resource/online/js/model/recommend.js?v={$Think.config.release_version}"></script>
+<script src="{$Think.config.domain.resource_url}/static/resource/online/js/model/activity.js?v={$Think.config.release_version}"></script>
+<script src="{$Think.config.domain.resource_url}/static/resource/online/js/controller/activity.js?v={$Think.config.release_version}"></script>
+<script src="{$Think.config.domain.resource_url}/static/resource/online/js/controller/confirm.js?v={$Think.config.release_version}"></script>
+<script>
+    confirmController.init();
+</script>
+</body>
+</html>

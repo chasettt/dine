@@ -1,0 +1,159 @@
+<html>
+    <head>
+        <title>下单成功</title>
+        <meta charset=utf-8>
+        <meta name=description content="">
+        <meta name=viewport content="width=device-width, initial-scale=1,user-scalable=no">
+        <script src="{$Think.config.domain.resource_url}/static/resource/online/scripts/jquery.min.js?v={$Think.config.release_version}"></script>
+        <script src="{$Think.config.domain.resource_url}/static/resource/online/scripts/wyrem.js?v={$Think.config.release_version}"></script>
+        <link rel="stylesheet" type="text/css" href="{$Think.config.domain.resource_url}/static/resource/online/css/commen.css?v={$Think.config.release_version}">
+        <link rel="stylesheet" type="text/css" href="{$Think.config.domain.resource_url}/static/resource/online/css/reset.css?v={$Think.config.release_version}">
+        <link rel="stylesheet" type="text/css" href="{$Think.config.domain.resource_url}/static/resource/online/css/success.css?v={$Think.config.release_version}">
+        <link rel="stylesheet" type="text/css" href="{$Think.config.domain.resource_url}/static/resource/online/css/orderSuccess.css?v={$Think.config.release_version}">
+    </head>
+    <body>
+        <div class="ordersuccess-container">
+            {if $isMember == 0}
+            <div class="l-header">
+                <!-- <div class="tin">加入西贝喜悦会VIP会员，本单优惠80元同时立得80元大礼包。</div> -->
+                <div class="tin">加入西贝喜悦会VIP会员，尊享VIP优惠</div>
+                <div class="l-btn"><a href="{$vipBuy}" id="vip_buy"></a></div>
+            </div>
+            {/if}
+            <div class="l-tip ordersuccess-watingtxt">
+                <div class="l-img" style="background-image: url('{$Think.config.domain.resource_url}/static/resource/online/images/icon/children.png');"></div>
+                <div class="order-success">
+                	<span class="tu" style="background-image: url('{$Think.config.domain.resource_url}/static/resource/online/images/icon/icon_r.png');"></span>
+                	<span class="word">下单成功</span>
+                </div>
+                <div class="new_text txt_list" style="display:block;">
+                    <p class="p1">I Love 莜，西贝向您承诺:</p>
+                    <p class="p2">闭着眼睛点，道道都好吃。</p>
+                    <p class="p2">25分钟上齐一桌好饭，祝您好胃口！</p>
+                </div>
+                <div class="l-btn J-btn-sure">我知道了</div>
+            </div>
+            <div class="layoutTile hide">
+                <div class="iconLeft">
+                    <div class="line"></div>
+                </div>
+                <p>大家都爱吃的菜</p>
+                <div class="iconRight">
+                    <div class="line"></div>
+                </div>
+            </div>
+            <div class="l-slide-box hide">
+                <div class="l-slide J-foodlist success-recommend">
+                    
+                </div>
+            </div>
+            <!-- 猜你喜欢文字显示 -->
+            <div class="layoutTile hide">
+                <div class="iconLeft">
+                    <div class="line"></div>
+                </div>
+                <p>猜你喜欢</p>
+                <div class="iconRight">
+                    <div class="line"></div>
+                </div>
+            </div>
+
+            <div class="l-active-wrap">
+                
+            </div>
+            <div class="l-block"></div>
+        </div>
+        
+        <!--弹出层 开始-->
+        <!--恭喜！获微信下单 first-->
+        {if $activityInfo && $drawState == 1}    
+        <div class="layer-mt-1">
+        	<div class="rell">
+        		<!--<div class="bao" style="background-image:url('{$Think.config.domain.resource_url}/static/resource/online/images/icon/bao.png');"></div>-->
+        		<!--<p class="dan-1">恭喜！获微信下单</p>-->
+        		<!--<p class="dan-2"><span class="sp1">抢豪礼</span><span class="sp2">机会</span></p>-->
+        		<div class="disk"><a href="{$activityInfo['url']}" class="ma"><img src="{$Think.config.domain.resource_url}{$activityInfo['img']}"/></a></div>
+        		<!--<div class="prize">-长按我百分之百中奖哦-</div>-->
+        		<div class="del delt" style="background-image: url('{$Think.config.domain.resource_url}/static/resource/online/images/icon/close.png');"></div>
+        	</div>
+        </div>
+        {/if}
+        {if $activityInfo && $drawState == 0}
+        <div class="layer-mt-1">
+            <!--恭喜！获微信下单 end-->
+            <!--很遗憾，你与大奖擦肩而过 fitst-->
+            <div class="rell">
+                <div class="redb"></div>
+                <p class="pity-1">很遗憾！</p>
+                <p class="pity-2">你与西贝大奖擦肩而过</p>
+                <div class="btn-a"><p class="nou">加份美食 抢回豪礼</p></div>
+                <div class="del dell" style="background-image: url('{$Think.config.domain.resource_url}/static/resource/online/images/icon/close.png');"></div>
+            </div>
+            <!--很遗憾，你与大奖擦肩而过 end-->
+        </div>
+        {/if}
+        <!--弹出层 结束-->
+
+        <!-- 屏幕横竖提醒start-->
+        <div id="orientLayer" class="mod-orient-layer">
+            <div class="mod-orient-layer__content">
+                <i class="icon mod-orient-layer__icon-orient"></i>
+                <div class="mod-orient-layer__desc">为了更好的体验，请使用竖屏浏览</div>
+            </div>
+        </div>
+        <!-- 屏幕横竖提醒end-->
+        <!--底部按钮start-->
+        <div class="index-footer-text footer-menu index_plate_flash" style="display: none;">
+            <div class="footer-menu-disk-r J-cart-bar" style="display:none;">
+                <div class="footer-menu-disk-txt J-cart-total-text"></div>
+                <div class="footer_btn_content">
+                    <div class="footer_btn_content_left" style="display:none;">加菜</div>
+                    <div class="footer_btn_content_right J-btn-cartsave">选好了</div>
+                </div>
+            </div>
+            <div class="footer-menu-diskContent J-btn-cart">
+                <div class="t">+1</div>
+                <div class="l"></div>
+                <div class="footer-menu-disk-img">
+                    <div class="texts J-cart-people-num">1</div>
+                </div>
+                <div class="r"></div>
+            </div>
+            <div class="icon-number J-cart-total-count" style="display: none;"><span>1</span></div>
+        </div>
+        <!--底部按钮end-->
+        <!-- 餐盘遮罩start -->
+        <div class="fooddiskselect J-cart-wrap" id="cart">
+            <div class="disklistsave">
+                <ul class="J-cart-list" id="listgoods"></ul>
+            </div>
+        </div>
+        <!-- 餐盘遮罩end -->
+        <script src="https://res.wx.qq.com/open/js/jweixin-1.1.0.js?v={$Think.config.release_version}"></script>
+        <script src="{$Think.config.domain.resource_url}/static/resource/online/scripts/jquery.cookie.js?v={$Think.config.release_version}"></script>
+        <script src="{$Think.config.domain.resource_url}/static/resource/online/scripts/jquery.eraser.js?v={$Think.config.release_version}"></script>
+        <script src="{$Think.config.domain.resource_url}/static/resource/online/scripts/jquery.fly.min.js?v={$Think.config.release_version}"></script>
+        <script src="{$Think.config.domain.resource_url}/static/resource/online/js/common/utils.js?v={$Think.config.release_version}"></script>
+        <script src="{$Think.config.domain.resource_url}/static/resource/online/js/common/config.js?v={$Think.config.release_version}"></script>
+        <script src="{$Think.config.domain.resource_url}/static/resource/online/js/common/factory.js?v={$Think.config.release_version}"></script>
+        <script src="{$Think.config.domain.resource_url}/static/resource/online/js/common/common.js?v={$Think.config.release_version}"></script>
+        <script src="{$Think.config.domain.resource_url}/static/resource/online/js/model/scratch.js?v={$Think.config.release_version}"></script>
+        <script type="text/javascript">
+            var token = $.cookie("{:config('cache_keys.oauth_token')}");
+        </script>
+        <script src="{$Think.config.domain.resource_url}/static/resource/online/js/model/recommend.js?v={$Think.config.release_version}"></script>
+        <script src="{$Think.config.domain.resource_url}/static/resource/online/js/model/ad.js?v={$Think.config.release_version}"></script>
+        <script src="{$Think.config.domain.resource_url}/static/resource/online/js/model/food.js?v={$Think.config.release_version}"></script>
+        <script src="{$Think.config.domain.resource_url}/static/resource/online/js/controller/index.js?v={$Think.config.release_version}"></script>
+        <script src="{$Think.config.domain.resource_url}/static/resource/online/js/controller/success.js?v={$Think.config.release_version}"></script>
+        <script type="text/javascript">
+            successController.init();
+            successController.showAd();
+            
+            //隐藏弹出层
+            $('.dell,.delt').on('click',function(){
+            	$('.layer-mt-1').hide(500);
+            });
+        </script>
+    </body>
+</html>

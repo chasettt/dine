@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title></title>
+	<meta charset=utf-8>
+	<meta name=description content="">
+	<meta name=viewport content="width=device-width, initial-scale=1,user-scalable=no">
+	<link rel="stylesheet" type="text/css" href="{$Think.config.domain.resource_url}/static/resource/online/css/rank.css?v={$Think.config.release_version}">
+	<link rel="stylesheet" type="text/css" href="{$Think.config.domain.resource_url}/static/resource/online/css/commen.css?v={$Think.config.release_version}">
+	<link rel="stylesheet" type="text/css" href="{$Think.config.domain.resource_url}/static/resource/online/scripts/need/layer.css?v={$Think.config.release_version}">
+	<link rel="stylesheet" type="text/css" href="{$Think.config.domain.resource_url}/static/resource/online/css/reset.css?v={$Think.config.release_version}">
+	<link rel="stylesheet" type="text/css" href="{$Think.config.domain.resource_url}/static/resource/online/css/index.css?v={$Think.config.release_version}">
+	<script src="{$Think.config.domain.resource_url}/static/resource/online/scripts/jquery.min.js?v={$Think.config.release_version}"></script>
+	<script src="{$Think.config.domain.resource_url}/static/resource/online/scripts/wyrem.js?v={$Think.config.release_version}"></script>
+</head>
+<body>
+    <div class="rank-containter">
+        <div class="rank-bar">
+            <div class="rank-back-icon" id="rankBackicon">
+                <a href=" javascript:history.go(-1);"></a>
+            </div>
+            <div class="rank-title">菜品排行榜</div>
+        </div>
+        
+        <div class="rank-body new-rank">
+            <ul class="food-lists J-foodlist" style="padding-bottom: 1.5rem;"></ul>
+            <!--无列表显示-->
+            <div class="no_rank_list" style="display:none;"></div>
+        </div>
+    </div>
+
+    <!--底部按钮start-->
+    <div class="footer-menu">
+        <div class="footer-menu-disk-r J-cart-bar" style="display:none;">
+            <div class="footer-menu-disk-txt J-cart-total-text">已选<span>0</span>个菜</div>
+            <div class="footer_btn_content">
+                <div class="footer_btn_content_left J-btn-addfood" style="display:none;">加菜</div>
+                <div class="footer_btn_content_right J-btn-cartsave">选好了</div>
+            </div>
+        </div>
+        <div class="footer-menu-diskContent J-btn-cart">
+            <div class="footer-menu-disk-img"></div>
+        </div>
+        <div class="icon-number J-cart-total-count" style="display: none;"><span>0</span></div>
+    </div>
+<!-- 提示框 -->
+<div class="ui-tips"></div>
+
+<!--底部按钮end-->
+<!-- 餐盘遮罩start -->
+<div class="fooddiskselect J-cart-wrap" id="cart">
+	<div class="disklistsave">
+		<ul class="J-cart-list" id="listgoods"></ul>
+	</div>
+</div>
+
+<!-- 餐盘遮罩end -->
+    <!-- 菜品详情弹出层start -->
+    <div id="dialogBg">
+        <div class="icon-bigmustnew-content icon-detail-attr J-fooddialog-food-tags hide"></div>
+        <div id="dialog" style="display:block;position:fixed;left:0;top:0;right: 0;bottom: 0;">
+            <div class="foodetail-body">
+                <div class="foodetail-main-content" style="position: relative;">
+                    <!-- 菜品图片 -->
+                    <div class="fooddetail-img-content">
+                        <div class="fooddetail-img-content-img" >
+                            <div class="J-fooddialog-food-pic"></div>
+                        </div>
+                    </div>
+                    <!-- 菜品图片 -->
+                    <div class="dialogTop">
+ 			            <div class="claseDialogBtn"></div>
+ 			        </div>
+                </div>
+                <div class="foodcontent">
+                    <div class="foodcontent-title">
+                        <span class="J-fooddialog-food-title"></span>
+                        <div class="foodcontent-title-collection J-btn-favorite"></div>
+                        <div class="class-iocn J-fooddialog-food-attrs">
+                        </div>
+                    </div>
+                    <div class="dialog-foodShopFun">
+                        <div class="foo-list-price food-list-alerticon J-fooddialog-food-price"></div>
+                        <div class="food-list-disfull food-list-shoppingCartbtn J-item-console">
+                            <em class="adds J-add-item"></em>
+                            <span class="num J-item-num" style="display: none;"></span>
+                            <em class="minus J-remove-item" style="display: none;"></em>
+                        </div>
+                    </div>
+                    
+                    <div class="foodcontent-dibumark J-remark-btn">
+                        <div class="foodcontent-dibumark-triangle">菜品备注</div>
+                        <div class="foodcontent-dibumark-triangle-down hide"></div>
+                    </div>
+                    <div class="foodcontent-dibumark-detail J-remark-content">
+                        <div class="foodcontent-dibumark-detail-beizhu">
+                            <textarea style="width:7rem;height:1.1rem;line-height: .35rem;" placeholder="选择忌口备注或自己手动填写" class="J-remark-input"></textarea>
+                            <ul class="J-remark-button clear" style="display: none;">
+                                <li class="J-remark-text"></li>
+                            </ul>
+                            <ol class="J-remark-button clear" style="display: none;">
+                             	                                       
+                             </ol>
+                        </div>
+                    </div>
+                    
+                    <div class="foodcontent-dibumark J-remark-btn">
+                         <div class="foodcontent-dibumark-triangle">菜品描述</div>
+                     </div>
+                    <div class="foodcontent-text">
+                        <div class="foodcontent-text-font J-fooddialog-food-desc">
+                        </div>
+                    </div>
+                    
+                    <div class="foodcontent-strog"></div>
+                    
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- 菜品详情弹出层end -->
+
+	<!-- 屏幕横竖提醒start-->
+	<div id="orientLayer" class="mod-orient-layer">
+	    <div class="mod-orient-layer__content">
+	        <i class="icon mod-orient-layer__icon-orient"></i>
+	        <div class="mod-orient-layer__desc">为了更好的体验，请使用竖屏浏览</div>
+	    </div>
+	</div>
+	<!-- 屏幕横竖提醒end-->
+<script src="//webapi.amap.com/maps?v=1.3&key=bdd9e8e4a83eb6414c0b362dfc883062"></script>
+<script src="//res.wx.qq.com/open/js/jweixin-1.1.0.js?v={$Think.config.release_version}"></script>
+<script src="{$Think.config.domain.resource_url}/static/resource/online/scripts/jquery.cookie.js?v={$Think.config.release_version}"></script>
+<script src="{$Think.config.domain.resource_url}/static/resource/online/scripts/jquery.lazyload.js?v={$Think.config.release_version}"></script>
+<script src="{$Think.config.domain.resource_url}/static/resource/online/scripts/swiper-3.4.2.jquery.min.js?v={$Think.config.release_version}"></script>
+<script src="{$Think.config.domain.resource_url}/static/resource/online/scripts/jquery.fly.min.js?v={$Think.config.release_version}"></script>
+<script src="{$Think.config.domain.resource_url}/static/resource/online/js/common/utils.js?v={$Think.config.release_version}"></script>
+<script src="{$Think.config.domain.resource_url}/static/resource/online/js/common/config.js?v={$Think.config.release_version}"></script>
+<script src="{$Think.config.domain.resource_url}/static/resource/online/js/common/factory.js?v={$Think.config.release_version}"></script>
+<script src="{$Think.config.domain.resource_url}/static/resource/online/js/common/common.js?v={$Think.config.release_version}"></script>
+<script src="{$Think.config.domain.resource_url}/static/resource/online/js/model/store.js?v={$Think.config.release_version}"></script>
+<script src="{$Think.config.domain.resource_url}/static/resource/online/js/model/user.js?v={$Think.config.release_version}"></script>
+<script src="{$Think.config.domain.resource_url}/static/resource/online/js/model/food.js?v={$Think.config.release_version}"></script>
+<script src="{$Think.config.domain.resource_url}/static/resource/online/js/model/rank.js?v={$Think.config.release_version}"></script>
+<script src="{$Think.config.domain.resource_url}/static/resource/online/js/model/favorite.js?v={$Think.config.release_version}"></script>
+<script src="{$Think.config.domain.resource_url}/static/resource/online/js/controller/ranking.js?v={$Think.config.release_version}"></script>
+    <script type="text/javascript">
+        var storeId = Util.getUrlParam('store_id');
+        var tableNo = Util.getUrlParam('table_no');
+        var from = Util.getUrlParam('from');
+        indexController.init(storeId, tableNo);
+    </script>
+</body>
+</html>

@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>订单详情页</title>
+    <meta charset=utf-8>
+    <meta name=description content="">
+    <meta name=viewport content="width=device-width, initial-scale=1,user-scalable=no">
+    <link rel="stylesheet" type="text/css" href="{$Think.config.domain.resource_url}/static/resource/online/css/reset.css?v={$Think.config.release_version}">
+    <link rel="stylesheet" href="{$Think.config.domain.resource_url}/static/resource/online/css/commen.css?v={$Think.config.release_version}"/>
+    <link rel="stylesheet" href="{$Think.config.domain.resource_url}/static/resource/online/css/takeOutDetail.css?v={$Think.config.release_version}"/>
+    <script src="{$Think.config.domain.resource_url}/static/resource/online/scripts/jquery.min.js?v={$Think.config.release_version}"></script>
+    <script src="{$Think.config.domain.resource_url}/static/resource/online/scripts/wyrem.js?v={$Think.config.release_version}"></script>
+</head>
+<body>
+<div class="takeOutDetail">
+    <!--下单失败显示-->
+    <div class="fail">
+        <div class="bgFail"></div>
+        <div class="stateBox">
+            <i></i>
+            <span class="e5Color" id="orderState"></span>
+        </div>
+        <div class="failMessage"><!-- 请联系店内服务员手动下单 --></div>
+    </div>
+    <div class="takeOutDetailBody">
+        <!--基本信息-->
+        <div class="baseInfo infoBox">
+            <div class="title">
+                <p>基本信息</p>
+            </div>
+            <div class="options inner">
+                <div class="orderCode flexSpaceBtn">订单编号: <span class="pl16"></span></div>
+                <div class="orderDate pt36 flexSpaceBtn">下单日期: <span class="pl16"></span></div>
+                <div class="dishNum pt36 flexSpaceBtn">菜品数量: <span class="pl16">5份</span></div>
+            </div>
+        </div>
+        <!--异常信息-->
+        <div class="abnormalInfo infoBox">
+            <!-- <div class="title e5Color">
+                <p>异常信息<span>(请联系服务员)</span></p>
+            </div> -->
+            <div class="title">
+                <p>订单详情</p>
+            </div>
+            <div class="list inner greyColor">
+            
+            </div>
+        </div>
+        <!--支付信息-->
+        <div class="payInfo infoBox">
+            <div class="title">
+                <p>支付信息</p>
+            </div>
+            <div class="orderUnit">
+                <div class="">订单金额<span></span><!-- <i class="e5Color" style="display:block;">未支付</i> --></div>
+            </div>
+        </div>
+    </div>
+</div>
+<!--loading加载中satrt-->
+<div class="TakeOutLoading">
+    <div class="TakeOutLoadingBg"></div>
+</div>
+<!--loading加载中end-->
+</body>
+<script src="{$Think.config.domain.resource_url}/static/resource/online/scripts/jquery.cookie.js?v={$Think.config.release_version}"></script>
+<script src="{$Think.config.domain.resource_url}/static/resource/online/js/common/utils.js?v={$Think.config.release_version}"></script>
+</html>
+<script type="text/javascript">
+    var token=$.cookie("{:config('cache_keys.oauth_token')}");
+    var order_sn=Util.getUrlParam('order_sn');
+    // 查询是否是会员
+    var is_member=null;
+    $.ajax({
+        'url':'/api/Users/info?token='+token,
+        'type':'post',
+        'async':false,
+        'success':function(data){
+            var data=data.data;
+            is_member=data.is_member;
+        }
+    });
+    $.ajax({
+        'url':'/api/payment/get?token='+token,
+        'type':'post',
+        'data':{'order_sn':order_sn},
+        'success':function(data){
+            if(data.code != 200){
+                return false;
+            }
+            var data=data.data;
+            console.log(data);
+            if(data.pay_state==3){
+                $('#orderState').text('订单失效');
+            }else if(data.pay_state==2){
+                $('#orderState').text('支付失败');
+            }
+            // 查询门店会员规则
+            var member_rules=0;
+            $.ajax({
+                'url':'/api/Store/info?token='+token,
+                'type':'post',
+                'async':false,
+                'data':{'store_code':data.store_code},
+                'success':function(data){
+                    var data=data.data;
+                    member_rules=data.member_rules;
+                }
+            });
+            // console.log(data);
+            $('div.orderCode span.pl16').text(data.order_no);
+            $('div.dishNum span.pl16').text(data.total_number+'份');
+            $('div.orderDate span.pl16').html(data.order_no.substr(0,4)+'-'+data.order_no.substr(4,2)+'-'+data.order_no.substr(6,2)+' <span>'+data.order_no.substr(8,2)+':'+data.order_no.substr(10,2)+'</span>');
+            var html='';
+            $.each(data.food_list,function(k,v){
+                html+='<div class="item"><div class="name">'+v.food_name+'</div><div class="num">x'+v.food_number+'</div>';
+                if(is_member && member_rules && v.food_member_price!=v.food_price){
+                    html+='<div class="price vip-price">¥'+v.food_member_price;
+                    $('div.orderUnit span').text('￥'+data.order_amount_member);
+                }else{
+                    html+='<div class="price">¥'+v.food_price;
+                    $('div.orderUnit span').text('￥'+data.order_amount);
+                }
+                html+='</div><div class="state">未下单</div></div>';
+            });
+            $('div.list').html(html);
+            $('div.TakeOutLoading').hide();
+        }
+    });
+</script>

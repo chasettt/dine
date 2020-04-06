@@ -1,0 +1,337 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>{$store_name|default=''}</title>
+    <meta charset=utf-8>
+    <meta name=description content="">
+    <meta name=viewport content="width=device-width, initial-scale=1,user-scalable=no">
+    <link rel="stylesheet" type="text/css" href="{$Think.config.domain.resource_url}/static/resource/online/css/commen.css?v={$Think.config.release_version}">
+    <link rel="stylesheet" type="text/css" href="{$Think.config.domain.resource_url}/static/resource/online/css/reset.css?v={$Think.config.release_version}">
+    <link rel="stylesheet" type="text/css" href="{$Think.config.domain.resource_url}/static/resource/online/css/index.css?v={$Think.config.release_version}">
+    <link rel="stylesheet" type="text/css" href="{$Think.config.domain.resource_url}/static/resource/online/css/rank.css?v={$Think.config.release_version}">
+    <link rel="stylesheet" type="text/css" href="{$Think.config.domain.resource_url}/static/resource/online/css/favorites.css?v={$Think.config.release_version}">
+    <link rel="stylesheet" type="text/css" href="{$Think.config.domain.resource_url}/static/resource/online/css/pullMenuFail.css?v={$Think.config.release_version}">
+    <script src="{$Think.config.domain.resource_url}/static/resource/online/scripts/jquery.min.js?v={$Think.config.release_version}"></script>
+    <script src="{$Think.config.domain.resource_url}/static/resource/online/scripts/wyrem.js?v={$Think.config.release_version}"></script>
+    <!-- 后退强制刷新解决方案 START -->
+    <script>
+        var getTime = "{:time()}";
+        window.onpageshow = function(){
+            var str = navigator.userAgent;
+            var isiPhone = str.indexOf("iPhone")!=-1;
+            if(isiPhone){
+                var REMOTE_VER = getTime;
+                if(REMOTE_VER){
+                    var LOCAL_VER = sessionStorage && sessionStorage.PAGEVERSION;
+                    if(LOCAL_VER && parseInt(LOCAL_VER) >= parseInt(REMOTE_VER)){
+                        //说明html是从本地缓存中读取的
+                        location.reload(true);
+                    }else{
+                        //说明html是从server端重新生成的，更新LOCAL_VER
+                        sessionStorage.PAGEVERSION = REMOTE_VER;
+                    }
+                }
+            }
+        };
+    </script>
+    <!-- 后退强制刷新解决方案 END -->
+</head>
+<body>
+    <div class="wrapper-mt-a">
+        <div class="headerTop">
+            <div class="searchfor">
+                <div class="arr-l J-search-back"></div>
+                <div class="inf">
+                    <div class="rel">
+                        <input type="text" class="inx J-search-input" placeholder="输入菜品名称">
+                        <span class="close J-search-close" style="display: none"></span>
+                    </div>
+                </div>
+                <div class="sou J-search-start">搜索</div>
+            </div>
+            <div class="msa">
+                <dl class="dlt">
+                    <dd class="J-my-search on">
+                        <p class="ju">我的搜索</p>
+                        <span class="line"></span>
+                    </dd>
+                    <dd class="J-all-like">
+                        <p class="ju">大家都在吃</p>
+                        <span class="line"></span>
+                    </dd>
+                </dl>
+            </div>
+        </div>
+        
+        <!--搜索到有内容时 start-->
+        <div class="detail-bge J-search-show" style="display: none">
+            <dl class="dll J-search-list J-foodlist">
+            </dl>
+            <dl class="dll J-all-like-list J-foodlist J-score-list" style="display: none">
+            </dl>
+        </div>
+        <!--搜索到有内容时 end-->
+        
+        <!--如果搜索不到，用下面这个层 start-->
+        <div class="detail-bgf J-search-empty">
+            <!--下架 start-->
+            <div class="lower J-search-none" style="display:none;">
+                <div class="shelf"></div>
+                <p class="xia">很遗憾<br>您搜索的美食可能已经下架了</p>
+            </div>
+            <!--下架 end-->
+            
+            <!--摇一摇 start-->
+            <div class="shake J-search-shake">
+                <div class="tu"></div>
+                <div class="yao"></div>
+            </div>
+            <!--摇一摇 end-->
+        </div>
+        <!--如果搜索不到，用下面这个层 end-->
+    
+    </div>
+    <!--页面加载-->
+    <div class="loadingpage-container J-page-loading">
+        <div class="loadingpage-container-lodingimg"></div>
+    </div>
+    <!-- 页面html -->
+    
+    <!--提示框-->
+    <div class="ui-tips"></div>
+    
+    <!--加载框-->
+    <div id="loadingToast" style="display: none;">
+        <div class="ui-mask_transparent"></div>
+        <div class="ui-toast">
+            <i class="ui-loading"></i>
+        </div>
+    </div>
+    
+    <!--底部按钮start-->
+    <div class="index-footer-text footer-menu index_plate_flash">
+        <!--增加提示内容 first-->
+        <div class="msgs">
+            <p class="zhu">恭喜<label>你</label>，获微信下单<span class="hao">抢豪礼</span>的机会！</p>
+            <p class="zhu">再加<span class="hao"></span>，每桌有1次<span class="hao">抢豪礼</span>的机会！</p>
+            <p class="zhu">活动期间，微信下单<span class="hao">抢豪礼</span>啦！</p>
+        </div>
+        <!--增加提示内容 end-->
+        
+        <div class="footer-menu-disk-r J-cart-bar" style="display:none;">
+            <div class="footer-menu-disk-txt J-cart-total-text"></div>
+            <div class="footer_btn_content">
+                <div class="footer_btn_content_right J-btn-cartsave">选好了</div>
+            </div>
+        </div>
+        <div class="footer-menu-diskContent J-btn-cart">
+            <div class="t">+1</div>
+            <div class="l"></div>
+            <div class="footer-menu-disk-img">
+                <div class="texts J-cart-people-num">1</div>
+            </div>
+            <div class="r"></div>
+        </div>
+        <div class="icon-number J-cart-total-count" style="display: none;"><span>1</span></div>
+    </div>
+    <!--底部按钮end-->
+    
+    <!-- 餐盘遮罩start -->
+    <div class="fooddiskselect J-cart-wrap" id="cart" style="display: none;">
+        <div class="disklistsave">
+            <div class="rela">
+                <!-- logo -->
+                <div class="food-logo"></div>
+                <!-- 菜品列表 -->
+                <ul class="J-cart-list" id="listgoods"></ul>
+            </div>
+        </div>
+    </div>
+    <!-- 餐盘遮罩end -->
+    
+    <!-- 定位错误页面 -->
+    <div class="pullMenuFail-container J-page-error" style="display: none; z-index: 4000;">
+        <div class="pullMenuFail-statusimg">
+            <div class="pullMenuFail-img"></div>
+        </div>
+        <div class="pullMenuFail-watingtxt">
+            <p class="J-page-error-content"></p>
+        </div>
+        <div class="pullMenuFail-tips" onClick="window.location.reload();">重新定位</div>
+    </div>
+    
+    <!-- 屏幕横竖提醒start-->
+    <div id="orientLayer" class="mod-orient-layer">
+        <div class="mod-orient-layer__content">
+            <i class="icon mod-orient-layer__icon-orient"></i>
+            <div class="mod-orient-layer__desc">为了更好的体验，请使用竖屏浏览</div>
+        </div>
+    </div>
+<!-- 屏幕横竖提醒end-->
+
+<!-- 自由配弹框 -->
+<div class="mask-free J-combo-pop">
+    <div class="layout-free">
+        <div class="f-top">
+            <img src="" />
+            <div class="f-top-txt">
+                <h4 class="J-combo-name"></h4>
+                <p class="J-combo-desc"></p>
+            </div>
+            <div class="f-btn-exit"></div>
+        </div>
+        <!-- 内容区域 -->
+        <div class="layout-content">
+            <!-- 标题 -->
+            <div class="f-title">
+                <p>套餐详情</p>
+                <span></span>
+            </div>
+            <div class="f-dialog J-combo-main">
+        
+            </div>
+            <div class="J-combo-select J-combo-vice">
+        
+            </div>
+        </div>
+        <div class="btn-join-plate">
+            <div class="p-left J-combo-price">¥</div>
+            <div class="p-right J-combo-confirm">加入餐盘</div>
+        </div>
+    </div>
+    </div>
+<!-- end 自由配弹框 -->
+
+    <!-- 弹框1 -->
+    <div class="mask-public single-click" style="display: none">
+        <div class="layout-public">
+            <div class="wx-tips"></div>
+            <div class="txt-area">小伙伴已点过西贝面筋啦， 还要继续添加吗？</div>
+            <div class="click-group">
+                <div class="btn-know">我知道了</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 弹框2 -->
+    <div class="mask-public double-click">
+        <div class="layout-public">
+            <div class="wx-tips"></div>
+            <div class="txt-area">小伙伴已点过西贝面筋啦， 还要继续添加吗？</div>
+            <div class="click-group">
+                <div class="btn-continue">继续结账</div>
+                <span></span>
+                <div class="btn-know">我知道了</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 多规格 -->
+    <div class="mask-multi">
+        <div class="mulit-box">
+            <div class="del J-remark-cancel"></div>
+            <div class="layout-mulit">
+                <!-- 头部菜品信息 -->
+                <div class="food-top">
+                    <div class="food-img">
+                        <img src="http://static.xibeidev.com/uploads/food/280x194/10003.jpg" />
+                    </div>
+                    <div class="food-list-r">
+                        <div class="food-list-title">
+                            <span>秋葵(葱油)</span>
+                        </div>
+                        <div class="tip-same-dish txt-description">新鲜蔬菜，过水浇汁，减少营养流失主料：秋葵"</div>
+                        <div class="icon-no-spicy">不能免辣</div>
+                        <div class="foo-list-price">
+                    <span class="food-price-content left-price fl">
+                        <span class="yuan_mark">￥</span>
+                        <div class="addDeleLine">
+                            <strong>23</strong>
+                            <i class="food-kind">/份</i>
+                        </div>
+                    </span>
+                        </div>
+                        <div class="food-list-disfull index_cart J-spec-console" data-foodid="">
+                            <em class="adds J-add-spec"></em>
+                            <span class="num J-item-num" style="display: none;">0</span>
+                            <em class="minus J-remove-spec" style="display: none;"></em>
+                        </div>
+                    </div>
+                </div>
+                <!-- end -->
+                <!-- 选择种类 -->
+                <div class="type-list J-spec-list">
+                    <ul>
+                        <li class="active">牛脊骨</li>
+                        <li>牛胸骨</li>
+                        <li>牛拐骨</li>
+                        <li>牛米龙骨</li>
+                        <li>牛脖骨</li>
+                        <li>牛后棒骨</li>
+                    </ul>
+                </div>
+                <!-- end -->
+            </div>
+            <!-- 选择口味定制 -->
+            <div class="content-detail">
+                <div class="inf">
+                    <span class="title">口味定制</span>
+                </div>
+                <div class="text-a">
+                    <textarea class="textr J-remark-input" placeholder="请输入口味、偏好等要求"></textarea>
+                    <div class="num">
+                        <span class="shu J-remark-length">0</span>/30
+                    </div>
+                </div>
+                <div class="special-button">
+                    <p class="biao"></p>
+                    <ul class="J-remark-button clear ull-a">
+                        <li class="J-remark-text">
+    
+                        </li>
+                    </ul>
+                    <ol class="J-remark-button clear ull-b">
+                    
+                    </ol>
+                </div>
+            </div>
+            <!-- end -->
+            <div class="btn-sureMulti J-spec-submit">确定</div>
+        </div>
+    </div>
+
+<script src="//webapi.amap.com/maps?v=1.3&key=bdd9e8e4a83eb6414c0b362dfc883062"></script>
+<script src="//res.wx.qq.com/open/js/jweixin-1.1.0.js"></script>
+<script src="{$Think.config.domain.resource_url}/static/resource/online/scripts/jquery.cookie.js?v={$Think.config.release_version}"></script>
+<script src="{$Think.config.domain.resource_url}/static/resource/online/scripts/jquery.lazyload.js?v={$Think.config.release_version}"></script>
+<script src="{$Think.config.domain.resource_url}/static/resource/online/scripts/swiper-3.4.2.jquery.min.js?v={$Think.config.release_version}"></script>
+<script src="{$Think.config.domain.resource_url}/static/resource/online/scripts/jquery.fly.min.js?v={$Think.config.release_version}"></script>
+<script src="{$Think.config.domain.resource_url}/static/resource/online/js/common/utils.js?v={$Think.config.release_version}"></script>
+<script src="{$Think.config.domain.resource_url}/static/resource/online/js/common/config.js?v={$Think.config.release_version}"></script>
+<script src="{$Think.config.domain.resource_url}/static/resource/online/js/common/factory.js?v={$Think.config.release_version}"></script>
+<script src="{$Think.config.domain.resource_url}/static/resource/online/js/common/common.js?v={$Think.config.release_version}"></script>
+<script src="{$Think.config.domain.resource_url}/static/resource/online/js/model/ad.js?v={$Think.config.release_version}"></script>
+<script src="{$Think.config.domain.resource_url}/static/resource/online/js/model/store.js?v={$Think.config.release_version}"></script>
+<script src="{$Think.config.domain.resource_url}/static/resource/online/js/model/user.js?v={$Think.config.release_version}"></script>
+<script src="{$Think.config.domain.resource_url}/static/resource/online/js/model/food.js?v={$Think.config.release_version}"></script>
+<script src="{$Think.config.domain.resource_url}/static/resource/online/js/model/love.js?v={$Think.config.release_version}"></script>
+<script src="{$Think.config.domain.resource_url}/static/resource/online/js/model/activity.js?v={$Think.config.release_version}"></script>
+<script src="{$Think.config.domain.resource_url}/static/resource/online/js/controller/activity.js?v={$Think.config.release_version}"></script>
+<script src="{$Think.config.domain.resource_url}/static/resource/online/js/controller/search.js?v={$Think.config.release_version}"></script>
+<script src="{$Think.config.domain.resource_url}/static/resource/online/scripts/iscroll.js?v={$Think.config.release_version}"></script>
+<script src="{$Think.config.domain.resource_url}/static/resource/online/scripts/navbarscroll.js?v={$Think.config.release_version}"></script>
+<!--<script src="{$Think.config.domain.resource_url}/static/resource/admin/js/vconsole.min.js?v={$Think.config.release_version}"></script>-->
+<script>
+    var storeId = Util.getUrlParam('store_id');
+    var tableNo = Util.getUrlParam('table_no');
+    var urlType = Util.getUrlParam('type');
+    var from    = Util.getUrlParam('from');
+
+    searchController.init(storeId, tableNo);
+</script>
+<script>
+    // var vConsole = new VConsole();
+    // console.log("vibrate" in navigator);
+</script>
+</body>
+</html>

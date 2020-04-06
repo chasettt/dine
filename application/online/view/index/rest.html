@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>{$store_name}</title>
+        <meta charset=utf-8>
+        <meta name=description content="">
+        <meta name=viewport content="width=device-width, initial-scale=1,user-scalable=no">        
+        <link rel="stylesheet" type="text/css" href="{$Think.config.domain.resource_url}/static/resource/online/css/commen.css?v={$Think.config.release_version}">
+        <link rel="stylesheet" type="text/css" href="{$Think.config.domain.resource_url}/static/resource/online/css/reset.css?v={$Think.config.release_version}">
+        <link rel="stylesheet" type="text/css" href="{$Think.config.domain.resource_url}/static/resource/online/css/rest.css?v={$Think.config.release_version}">
+        <script src="{$Think.config.domain.resource_url}/static/resource/online/scripts/jquery.min.js?v={$Think.config.release_version}"></script>
+        <script src="{$Think.config.domain.resource_url}/static/resource/online/scripts/wyrem.js?v={$Think.config.release_version}"></script>
+    </head>
+    <body>
+        <div class="rest_container">
+            <div class="rest_bg"></div>
+            <div class="text_container">
+                <p>营业时间</p>
+                <p>{$openTime|str_replace='~','-',###}</p>
+            </div>
+        </div>
+        <!-- 屏幕横竖提醒start-->
+        <div id="orientLayer" class="mod-orient-layer">
+            <div class="mod-orient-layer__content">
+                <i class="icon mod-orient-layer__icon-orient"></i>
+                <div class="mod-orient-layer__desc">为了更好的体验，请使用竖屏浏览</div>
+            </div>
+        </div>
+        <!-- 屏幕横竖提醒start-->
+    </body>
+</html>

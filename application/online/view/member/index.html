@@ -1,0 +1,515 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title></title>
+	<meta charset=utf-8>
+	<meta name=description content="">
+	<meta name=viewport content="width=device-width, initial-scale=1,user-scalable=no">
+	<script src="{$Think.config.domain.resource_url}/static/resource/online/scripts/jquery.min.js?v={$Think.config.release_version}"></script>
+	<script src="{$Think.config.domain.resource_url}/static/resource/online/scripts/wyrem.js?v={$Think.config.release_version}"></script>
+	<link rel="stylesheet" type="text/css" href="{$Think.config.domain.resource_url}/static/resource/online/css/person.css?v={$Think.config.release_version}">
+	<link rel="stylesheet" type="text/css" href="{$Think.config.domain.resource_url}/static/resource/online/css/reset.css?v={$Think.config.release_version}">
+	<link rel="stylesheet" type="text/css" href="{$Think.config.domain.resource_url}/static/resource/online/css/commen.css?v={$Think.config.release_version}">
+	<link rel="stylesheet" type="text/css" href="{$Think.config.domain.resource_url}/static/resource/online/css/index.css?v={$Think.config.release_version}">
+</head>
+<body>
+	<div class="loadingpage-container">
+		<div class="loadingpage-container-lodingimg"></div>
+	</div>
+	<div class="personContainer">
+		<div class="header">
+			<div class="backArrow">
+				<i></i>
+			</div>
+			<p>外带订单</p>
+		</div>
+		<!--tab切换-->
+		<div class="tabBar" style="display: none">
+			<div class="order publicTab">
+				<!--激活加active-->
+				<div class="inner active">
+					<!--订单激活加activeOrder-->
+					<i class="activeOrder"></i>
+					<span>外带</span>						
+				</div>
+			</div>
+			<div class="collect publicTab">
+				<div class="inner">
+					<!--订单激活加activeCollect-->
+					<i></i>
+					<span>收藏</span>						
+				</div>
+			</div>
+		</div>
+		<!--有订单start-->
+		<div class="tOrder"  style="display:block;">
+			<!--订单列表-->
+			<div class="orderContainer">
+				
+			</div>
+		</div>
+		<!--有订单end-->
+		<!--有收藏start-->
+		<div class="collectContainer" style="display:none;">
+			<ul class="food-lists J-foodlist J-favorite-list">
+										
+			</ul>					
+		</div>			
+		<!--有收藏end-->
+		
+		<!--无订单start-->
+		<div class="noOrderBox noInfo" style="display:none;">
+			<div class="noOrder bgBox">
+				<div class="bg"></div>
+			</div>
+		<!--无订单end-->			
+	</div>
+	<!--无收藏start-->
+		<div class="noCollectBox noInfo" style="display:none;">
+			<div class="noCollect bgBox">
+				<div class="bg"></div>
+			</div>					
+			<!--店长推荐-->				
+		</div>
+	<!--无收藏end-->			
+
+	<!--新版菜品详情弹出层start-->
+		<div id="dialogBg">
+			<div class="icon-bigmustnew-content icon-detail-attr J-fooddialog-food-tags"></div>
+		    <div id="dialog" style="display:block;position:fixed;left:0;right:0;top:0;bottom:0;">
+		        <div class="foodetail-body">
+		            <div class="foodetail-main-content" style="position: relative;">
+		                <!-- 菜品图片 -->
+		                <div class="fooddetail-img-content">
+		                    <div class="fooddetail-img-content-img" >
+		                        <div class="J-fooddialog-food-pic"></div>
+		                    </div>
+		                </div>
+		                <!-- 菜品图片 -->
+		                <div class="dialogTop">
+		        			<div class="claseDialogBtn"></div>
+		    			</div>
+		                
+		            </div>
+		            <div class="foodcontent">
+		                <div class="foodcontent-title">
+		                    <span class="J-fooddialog-food-title"></span>
+		                    <div class="foodcontent-title-collection J-btn-favorite"></div>
+		                    <div class="class-iocn J-fooddialog-food-attrs">
+		                    </div>
+		                </div>
+		                <div class="dialog-foodShopFun">
+		                    <div class="foo-list-price food-list-alerticon J-fooddialog-food-price"></div>
+		                    <div class="food-list-disfull food-list-shoppingCartbtn J-item-console">
+		                        <em class="adds J-add-item"></em>
+		                        <span class="num J-item-num" style="display: none;"></span>
+		                        <em class="minus J-remove-item" style="display: none;"></em>
+		                    </div>
+		                </div>		                
+		                <div class="foodcontent-dibumark J-remark-btn">
+		                    <div class="foodcontent-dibumark-triangle">菜品备注</div>
+		                    <div class="foodcontent-dibumark-triangle-down hide"></div>
+		                </div>
+		                <div class="foodcontent-dibumark-detail J-remark-content">
+		                    <div class="foodcontent-dibumark-detail-beizhu">
+		                        <textarea style="width:7rem;height:1.1rem;line-height:.35rem;" placeholder="选择忌口备注或自己手动填写" class="J-remark-input"></textarea>
+		                        <ul class="J-remark-button" style="display: none;">
+		                            <li class="J-remark-text"></li>
+		                        </ul>
+		                        <ol class="J-remark-button" style="display: none;">
+		                        	
+		                        </ol>
+		                    </div>
+		                </div>
+		                
+		                <div class="foodcontent-dibumark J-remark-btn">
+ 		                    <div class="foodcontent-dibumark-triangle">菜品描述</div>
+ 		                </div>
+ 		                <div class="foodcontent-text">
+ 		                    <div class="foodcontent-text-font J-fooddialog-food-desc">
+ 		                    </div>
+ 		                </div>
+		                
+		                <div class="foodcontent-strog"></div>
+		            </div>
+		        </div>
+		    </div>
+		    
+		</div>
+	<!--新版菜品详情弹出层end-->
+	<!-- 餐盘遮罩start -->
+		<div class="fooddiskselect J-cart-wrap" id="cart">
+			<div class="disklistsave">
+				<ul class="J-cart-list" id="listgoods"></ul>
+			</div>
+		</div>
+	<!-- 餐盘遮罩end -->
+	<!--底部按钮start-->
+	<div class="footer-menu">
+	    <div class="footer-menu-disk-r J-cart-bar" style="display:none;">
+	        <div class="footer-menu-disk-txt J-cart-total-text">已选<span>0</span>个菜</div>
+	        <div class="footer_btn_content">
+	            <div class="footer_btn_content_left J-btn-addfood" style="display:none;">加菜</div>
+	            <div class="footer_btn_content_right J-btn-cartsave">选好了</div>
+	        </div>
+	    </div>
+	    <div class="footer-menu-diskContent J-btn-cart">
+	        <div class="footer-menu-disk-img"></div>
+	    </div>
+	    <div class="icon-number J-cart-total-count" style="display: none;"><span>0</span></div>
+	</div>
+	<!--底部按钮end-->
+	<!-- 屏幕横竖提醒start-->
+	<div id="orientLayer" class="mod-orient-layer">
+	    <div class="mod-orient-layer__content">
+	        <i class="icon mod-orient-layer__icon-orient"></i>
+	        <div class="mod-orient-layer__desc">为了更好的体验，请使用竖屏浏览</div>
+	    </div>
+	</div>
+	<!-- 屏幕横竖提醒end-->
+	<!--提示框-->
+	<div class="ui-tips"></div>
+</body>
+<script>
+	$(function(){
+		var personPage = {
+			init: function(){
+				this.methods();
+				$('.footer-menu').hide();
+			},
+			methods:function(){
+				$('.tabBar .publicTab').click(function(){
+					var index  =  $(this).index();
+					switch(index){
+						case 0:
+							$('.collect').find('.inner').removeClass('active').children('i').removeClass('activeCollect');
+							$('.order').find('.inner').addClass('active').children('i').addClass('activeOrder');
+							
+							if($('div.orderContainer div').length){
+								$('.tOrder').show();
+								$('.noOrderBox').hide();
+							}else{
+								$('.tOrder').hide();
+								$('.noOrderBox').show();
+							}
+							//有订单
+							$('.collectContainer').hide();
+							$('.footer-menu').hide();
+							//无订单时打开
+							$('.noCollectBox').hide();
+							break;
+						case 1:
+							$('.order').find('.inner').removeClass('active').children('i').removeClass('activeOrder');
+							$('.collect').find('.inner').addClass('active').children('i').addClass('activeCollect');
+							//有收藏
+							$('.footer-menu').show();
+							$('.tOrder').hide();
+							if($('ul.J-foodlist li').length){
+								$('.collectContainer').show();
+								$('.noCollectBox').hide();
+							}else{
+								$('.collectContainer').hide();
+								$('.noCollectBox').show();
+							}
+							//无收藏打开
+							$('.tOrder').hide();
+							$('.noOrderBox').hide();
+							break;
+					}
+				});
+				},
+			}
+		personPage.init();		
+	});
+</script>
+</html>
+<script src="{$Think.config.domain.resource_url}/static/resource/online/js/common/utils.js?v={$Think.config.release_version}"></script>
+<script src="//webapi.amap.com/maps?v=1.3&key=bdd9e8e4a83eb6414c0b362dfc883062"></script>
+<script src="//res.wx.qq.com/open/js/jweixin-1.1.0.js?v={$Think.config.release_version}"></script>
+<script src="{$Think.config.domain.resource_url}/static/resource/online/scripts/jquery.cookie.js?v={$Think.config.release_version}"></script>
+<script src="{$Think.config.domain.resource_url}/static/resource/online/scripts/jquery.lazyload.js?v={$Think.config.release_version}"></script>
+<script src="{$Think.config.domain.resource_url}/static/resource/online/scripts/swiper-3.4.2.jquery.min.js?v={$Think.config.release_version}"></script>
+<script src="{$Think.config.domain.resource_url}/static/resource/online/scripts/jquery.fly.min.js?v={$Think.config.release_version}"></script>
+<script src="{$Think.config.domain.resource_url}/static/resource/online/js/common/config.js?v={$Think.config.release_version}"></script>
+<script src="{$Think.config.domain.resource_url}/static/resource/online/js/common/factory.js?v={$Think.config.release_version}"></script>
+<script src="{$Think.config.domain.resource_url}/static/resource/online/js/common/common.js?v={$Think.config.release_version}"></script>
+<script src="{$Think.config.domain.resource_url}/static/resource/online/js/model/store.js?v={$Think.config.release_version}"></script>
+<script src="{$Think.config.domain.resource_url}/static/resource/online/js/model/user.js?v={$Think.config.release_version}"></script>
+<script src="{$Think.config.domain.resource_url}/static/resource/online/js/model/food.js?v={$Think.config.release_version}"></script>
+<!--<script src="{$Think.config.domain.resource_url}/static/resource/online/js/model/favorite.js?v={$Think.config.release_version}"></script>-->
+<script src="{$Think.config.domain.resource_url}/static/resource/online/js/controller/member.js?v={$Think.config.release_version}"></script>
+<!--<script src="{$Think.config.domain.resource_url}/static/resource/online/js/controller/favorite_new.js?v={$Think.config.release_version}"></script>-->
+<script src="{$Think.config.domain.resource_url}/static/resource/online/scripts/iscroll.js?v={$Think.config.release_version}"></script>
+<script src="{$Think.config.domain.resource_url}/static/resource/online/scripts/navbarscroll.js?v={$Think.config.release_version}"></script>
+<script src="{$Think.config.domain.resource_url}/static/resource/online/js/controller/ticket.js?v={$Think.config.release_version}"></script>
+<script src="{$Think.config.domain.resource_url}/static/resource/online/js/model/ticket.js?v={$Think.config.release_version}"></script>
+<script type="text/javascript">
+	var storeId = Util.getUrlParam('store_id');
+    var tableNo = Util.getUrlParam('table_no');
+    indexController.init(storeId, tableNo);
+    ticketController.init();
+    //favoriteController.init(storeId);
+    $('div.backArrow').click(function(){
+        window.history.go(-1);
+    });
+</script>
+<script type="text/javascript">
+var storeId = Util.getUrlParam('store_id');
+$(function(){
+	// 1位数转2位数
+	function toDouuble(num){
+		if(num<10){
+			return '0'+num;
+		}else{
+			return num;
+		}
+	}
+	// 时间格式化
+	function date(time){
+		time *= 1000;
+		time=new Date(time);
+		var year=time.getFullYear();
+		var month=toDouuble(time.getMonth()+1);
+		var day=toDouuble(time.getDate());
+		var hour=toDouuble(time.getHours());
+		var min=toDouuble(time.getMinutes());
+		var sec=toDouuble(time.getSeconds());
+		return year+'-'+month+'-'+day+' <em>'+hour+':'+min+':'+sec+'</em>';
+	}
+	
+	// 获取订单
+	var tOrderHeight=0;
+	var page=1;
+	// 获取订单flag,true需要获取
+	var orderFlag=true;
+	function getOrderList(page){
+		if(!orderFlag){
+			return false;
+		}
+		orderFlag=false;
+		var pageSize=10;
+		$.ajax({
+			'url':'/api/home/takeout?token={$token}',
+			'type':'post',
+			'data':{'page':page,'limit':pageSize},
+			'success':function(data){
+				if(!data.length){
+					if($('div.orderContainer div').length==0){
+						$('.tOrder').hide();
+						$('.noOrderBox').show();
+						$('div.loadingpage-container').hide();
+					}
+					$('div.orderContainer').append('<p class="noLoadMoreLine"><span>&nbsp;没有更多了&nbsp;</span></p>');
+					return false;
+				}
+				orderFlag=true;
+				var html='';
+				$.each(data,function(k,v){
+					if(v.pay_state==1){
+						if(v.order_state==1){
+							order_state='已下厨';
+						}else{
+							order_state='未下厨';
+						}
+					}else{
+						order_state='未支付';
+					}
+
+					// 跳转链接
+					if(v.pay_state==3){
+						// 订单过期
+						var href='/online/takeout/fail?store_id='+storeId+'&order_sn='+v.order_no;
+					}else if(v.pay_state==2){
+						// 支付失败
+						var href='/online/takeout/fail?store_id='+storeId+'&order_sn='+v.order_no;
+					}else if(v.pay_state==0 && v.order_state==0){
+						// 未支付、未下单
+						var href='/online/takeout/confirm?store_id='+storeId;
+					}else if(v.pay_state==1 && v.order_state==0){
+						// 支付成功，未下单
+						var href='/online/takeout/success?store_id='+storeId+'&order_sn='+v.order_no;
+					}else if(v.pay_state==1 && v.order_state==1){
+						// 支付成功，下单成功
+						var href='/online/takeout/success?store_id='+storeId+'&order_sn='+v.order_no;
+					}else if(v.pay_state==1 && v.order_state==2){
+						// 支付成功，下单失败
+						var href='/online/takeout/success?store_id='+storeId+'&order_sn='+v.order_no;
+					}
+
+					html+='<div class="item" href="'+href+'"><div class="orderState" style="background-image:url(/static/resource/online/images/takeout_bg.png);"><div class="stateLeft"><div class="titleState">';
+
+					if(v.pay_state==3){
+						// 订单过期
+						html+='<label style="color:#E50012;">订单失效</label>';
+					}else if(v.pay_state==2){
+						// 支付失败
+						html+='<label style="color:#E50012;">支付失败</label>';
+					}else if(v.pay_state==0 && v.order_state==0){
+						// 未支付、未下单
+						html+='<label style="color:#E50012;">未支付</label>';
+					}else if(v.pay_state==1 && v.order_state==0){
+						// 支付成功，未下单
+						html+='<label style="color:#E50012;">未下厨</label>';
+						html+='<span>(已支付)</span>';
+					}else if(v.pay_state==1 && v.order_state==1){
+						// 支付成功，下单成功
+						html+='订单编号:'+v.choice_id;
+						html+='<span>('+order_state+')</span>';
+					}else if(v.pay_state==1 && v.order_state==2){
+						// 支付成功，下单失败
+						html+='<label style="color:#E50012;">下单失败</label>';
+						html+='<span>(已支付)</span>';
+					}
+					html+='</div><div class="name"><p><span>'+v.store_name+'</span></p></div><div class="time"><p><span>'+date(v.order_create_time)+'</span></p></div></div></div>';
+					html+='<div class="orderList">';
+					$.each(v.food_list,function(key,val){
+						html+='<div class="item" href="'+href+'"><div class="name">'+val.food_name+'</div><div class="num">x'+val.food_number+'</div>';
+						if(v.member_rules && v.pay_member && val.food_member_price!=val.food_price){
+							html+='<div class="price vip-price">¥'+val.food_member_price*val.food_number;
+						}else{
+							html+='<div class="price">¥'+val.food_price*val.food_number;
+						}
+						html+='</div></div>';
+					})
+					html += '</div><div class="unit">';
+					if(v.pay_state == 1 && v.pay_amount > 0 && (ticketController.now - v.pay_time) < GET_TICKET_TIMES){
+						// pay_state 状态为1的代表已支付,才可以开发票
+						// 现在时间 - 支付时间 < 30天 可以开发票
+						html += '<div class="bill" order_no="' + v.order_no + '" invoice_url="' + v.invoice_url + '">开发票</div>';
+					}
+					if(v.member_rules && v.pay_member){
+						html+='<span>金额: ¥'+v.order_amount_member+'</span></div></div>';
+					}else{
+						html+='<span>金额: ¥'+v.order_amount+'</span></div></div>';
+					}
+				});
+				$('div.orderContainer').append(html);
+				$('div.loadingpage-container').hide();
+				tOrderHeight=$("div.tOrder").height();
+			}
+		});
+	}
+	// 跳转订单详情
+	$('div.orderContainer').on('click','div.item',function(e){
+		window.location.href=$(this).attr('href');
+		e.stopPropagation();
+	});
+	// 滚动加载数据
+	var scrollTop=$(window).scrollTop();
+	$(window).scroll(function(){
+		if($(window).scrollTop()>scrollTop && $(window).scrollTop()+$(window).height()*2+300 >= tOrderHeight){
+			scrollTop=$(window).scrollTop();
+			// 触发ajax
+			if(orderFlag){
+				page++;
+				getOrderList(page);
+			}
+		}
+	});
+	getOrderList(page);
+	// 请求收藏的菜品
+	/*$.ajax({
+		'url':'/api/favorite/list?token={$token}',
+		'type':'post',
+		'data':{
+			'store_code': {$store_code},
+			'table_id': tableNo,
+			'environment': indexController.environment
+		},
+		'success':function(data){
+			var data=data.data;
+			var length=Object.keys(data).length;
+			if(length){
+				$('.noCollectBox').hide();
+				// 是否是会员
+				var is_member=window.sessionStorage.getItem('is_member');
+				// 查询门店会员规则
+				var member_rules=indexController.storeInfo.member_rules;
+				var stored_url=indexController.storeInfo.stored_url;
+
+			}else{
+				$('.collectContainer').hide();
+				return false;
+			}
+
+			var html='';
+			$.each(data,function(k,v){
+				html+='<li class="J-fooditem" data-foodid="'+v.food_code+'"><div class="food-list-content fl">';
+				if(v.soldout){
+					html+='<div class="food-list-content-soldout"><div class="soldoutstamp"></div></div>';
+				}
+				html+='<div class="food-list-contentimg"><div class="J-food-pic" data-url="" style="opacity: 1; background-image: url('+v.food_image+');"></div></div></div><div class="icon-mustnew-content fl">';
+				if(v.is_essential){
+					// 必点
+					html+='<i class="musts-food-icon mini-icon-arr-foodcontent fl "></i>';
+				}
+				if(v.is_specialty){
+					// 招牌
+					html+='<i class="signature-food-icon  food-icon-distance mini-icon-arr-foodcontent fl"></i>';
+				}
+				html+='</div><div class="food-list-r"><div class="food-list-title"><span class="fl c-person-title">'+v.food_name+'</span>';
+				if(v.food_attrs){
+					html += Util.dialog.attr(v.food_attrs);
+				}
+				html+='</div><i class="star starActive J-favorite-del"></i><div class="foo-list-price">';
+				if(v.discount_price && v.discount_price !== 0){
+					var food_discount_price = v.discount_price.toString().split('.');
+	                if(food_discount_price[1] == '00'){
+	                    v.discount_price = food_discount_price[0];
+	                }else if(food_discount_price[1] && food_discount_price[1].substring(1) == '0'){
+	                    v.discount_price = food_discount_price[0] + '.' + food_discount_price[1].substring(0, 1);
+	                }
+	                // 特价菜
+	                html += '<span class="food-price-content vip-price fl">';
+	                html += '    <span class="yuan_mark">￥</span>';
+	                html += '    <div class="addDeleLine">';
+	                html += '        <strong>' + v.discount_price + '</strong>';
+	                if(v.discount_type == 1){
+						html += '        <i class="food-kind">/' + v.food_unit + '</i>'
+	                    html += '        <span class="special_label">' + v.discount_value.replace(/0|\./g,'') + '折</span>';
+	                }else{
+						html += '        <i class="food-kind">/' + v.food_unit + '</i>'
+	                    html += '        <span class="special_label">特</span>';
+	                }
+
+	                html += '    </div>';
+					html += '</span>';
+
+	                html += '<span class="food-price-content left-price fl delete-line">'
+	                html += '    <span class="yuan_mark">￥</span>'
+	                if(member_rules == 1 && v.discount_type == 1 && is_member){
+	                	html += '        <div class="addDeleLine"><strong>'+v.food_member_price+'</strong>'
+	                }else{
+	                	html += '        <div class="addDeleLine"><strong>'+v.food_price+'</strong>'
+	                }
+	                html += '        <i class="food-kind">/' + v.food_unit + '</i>'
+	                html += '    </div>'
+	                html += '</span>';
+				}else if(v.food_price == v.food_member_price){
+					// 普通价
+					html+='<span class="food-price-content left-price fl"><div class="addDeleLine"><span class="yuan_mark">￥</span><strong>'+v.food_price+'</strong><i class="food-kind">/'+v.food_unit+'</i></div></span>';
+				}else if( member_rules==1 && is_member=='true' ){
+					// 会员价 普通价(删除线)
+					html+='<span class="food-price-content left-price fl vip-price J-nonmember-tips"><div class="num-box"><span class="yuan_mark">￥</span><strong>'+v.food_member_price+'</strong><i class="food-kind">/'+v.food_unit+'</i><span class="vip_label"></span></div><!-- <div class="cirle-question"></div> --></span><span class="food-price-content left-price fl"><div class="addDeleLine delete-line"><span>￥</span><strong>'+v.food_price+'</strong></div></span>';
+				}else if( member_rules ){
+					// 普通价 会员价(删除线),点击问号弹出提示框或充值
+					html+='<span class="food-price-content left-price fl"><div class="addDeleLine"><span class="yuan_mark">￥</span><strong>'+v.food_price+'</strong><i class="food-kind">/'+v.food_unit+'</i></div></span><span class="food-price-content left-price fl vip_buy vip-price J-nonmember-tips"><div class="num-box"><span>￥</span><strong>'+v.food_member_price+'</strong><span class="vip_label"></span></div><!-- <div class="cirle-question"></div> --> </span>';
+				}else{
+					// 普通价
+					html+='<span class="food-price-content left-price fl"<div class="addDeleLine"><span class="yuan_mark">￥</span><strong>'+v.food_price+'</strong><i class="food-kind">/'+v.food_unit+'</i></div></span>';
+				}
+				html+='</div><div class="food-list-disfull index_cart J-item-console" style="' + (v.soldout ? "display:none;" : '') + '"><em class="adds J-add-item"></em>';
+
+				html+='<span class="num J-item-num" style="display: none;"></span><em class="minus J-remove-item" style="display: none;"></em>';
+				html+='</div></div></li>';
+			});
+			$('ul.food-lists').html(html);
+		}
+	});
+	// 收藏购物车数量
+	$('ul.J-favorite-list').on('click','div.J-food-pic',function(){
+		var num=$(this).parents('li.J-fooditem').find('span.J-item-num').text();
+		$('div#dialogBg').find('span.J-item-num').text(num);
+	});*/
+});
+</script>

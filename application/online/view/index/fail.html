@@ -1,0 +1,84 @@
+<html>
+    <head>
+        <title></title>
+        <meta charset=utf-8>
+        <meta name=description content="">
+        <meta name=viewport content="width=device-width, initial-scale=1,user-scalable=no">
+        <script src="{$Think.config.domain.resource_url}/static/resource/online/scripts/jquery.min.js?v={$Think.config.release_version}"></script>
+        <script src="{$Think.config.domain.resource_url}/static/resource/online/scripts/wyrem.js?v={$Think.config.release_version}"></script>
+        <link rel="stylesheet" type="text/css" href="{$Think.config.domain.resource_url}/static/resource/online/css/commen.css?v={$Think.config.release_version}">
+        <link rel="stylesheet" type="text/css" href="{$Think.config.domain.resource_url}/static/resource/online/css/reset.css?v={$Think.config.release_version}">
+        <link rel="stylesheet" type="text/css" href="{$Think.config.domain.resource_url}/static/resource/online/css/pullMenuFail.css?v={$Think.config.release_version}">
+    </head>
+    <body>
+        
+        <div class="pullMenuFail-container">
+            <div class="pullMenuFail-statusimg">
+                <div class="pullMenuFail-img"></div>
+            </div>
+            <div class="pullMenuFail_tipbox">
+                <div class="pullMenuFail-icon"></div>
+                <div class="pullMenuFail-text">{$title|default=''}</div>
+            </div>
+            <div class="pullMenuFail-watingtxt">
+                <p>{$description|default=''}</p>
+            </div>
+            {notempty name="button"}
+            <div class="pullMenuFail-tips {$button.class}">{$button.text}</div>
+            {/notempty}
+        </div>
+
+        <!-- 屏幕横竖提醒start-->
+        <div id="orientLayer" class="mod-orient-layer">
+            <div class="mod-orient-layer__content">
+                <i class="icon mod-orient-layer__icon-orient"></i>
+                <div class="mod-orient-layer__desc">为了更好的体验，请使用竖屏浏览</div>
+            </div>
+        </div>
+        <!-- 屏幕横竖提醒end-->
+        <script src="https://res.wx.qq.com/open/js/jweixin-1.1.0.js?v={$Think.config.release_version}"></script>
+        <script src="{$Think.config.domain.resource_url}/static/resource/online/scripts/jquery.cookie.js?v={$Think.config.release_version}"></script>
+        <script src="{$Think.config.domain.resource_url}/static/resource/online/js/common/utils.js?v={$Think.config.release_version}"></script>
+        <script src="{$Think.config.domain.resource_url}/static/resource/online/js/common/config.js?v={$Think.config.release_version}"></script>
+        <script src="{$Think.config.domain.resource_url}/static/resource/online/js/common/factory.js?v={$Think.config.release_version}"></script>
+        <script src="{$Think.config.domain.resource_url}/static/resource/online/js/common/common.js?v={$Think.config.release_version}"></script>
+	<script>
+        $(document).ready(function(){
+            var storeId = Util.getUrlParam('store_id');
+            var tableId = Util.getUrlParam('table_no');
+            var environment = '';
+            if (tableId) {
+                environment = 'online';
+            } else {
+                environment = 'reserve';
+            }
+            
+            // 扫码
+            $('.J-btn-scan').click(function() {
+                wx.scanQRCode({
+                    needResult : 0, // 默认为0，扫描结果由微信处理，1则直接返回扫描结果，
+                    scanType : [ "qrCode"], // 可以指定扫二维码还是一维码，默认二者都有
+                });
+            });
+            
+            // 刷新
+            $('.J-btn-refresh').click(function(){
+                var data = {
+                    source: environment,
+                    store_code: storeId
+                }
+                if (tableId) {
+                    data.table_id = tableId;
+                }
+                var opt = {
+                    type: 'post',
+                    data: data,
+                    dataType: 'json'
+		}
+                requestWrapper.sendRequestWithUrl(API_URL.LOG_URL, opt);
+                window.location.reload();
+            });
+        })
+	</script>
+    </body>
+</html>

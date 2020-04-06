@@ -1,0 +1,746 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>{$store_name|default=''}</title>
+    <meta charset=utf-8>
+    <meta name=description content="">
+    <meta name=viewport content="width=device-width, initial-scale=1,user-scalable=no">
+    <link rel="stylesheet" type="text/css" href="{$Think.config.domain.resource_url}/static/resource/online/css/commen.css?v={$Think.config.release_version}">
+    <link rel="stylesheet" type="text/css" href="{$Think.config.domain.resource_url}/static/resource/online/css/reset.css?v={$Think.config.release_version}">
+    <link rel="stylesheet" type="text/css" href="{$Think.config.domain.resource_url}/static/resource/online/css/index.css?v={$Think.config.release_version}">
+    <link rel="stylesheet" type="text/css" href="{$Think.config.domain.resource_url}/static/resource/online/css/rank.css?v={$Think.config.release_version}">
+    <link rel="stylesheet" type="text/css" href="{$Think.config.domain.resource_url}/static/resource/online/css/favorites.css?v={$Think.config.release_version}">
+    <link rel="stylesheet" type="text/css" href="{$Think.config.domain.resource_url}/static/resource/online/css/pullMenuFail.css?v={$Think.config.release_version}">
+    <script src="{$Think.config.domain.resource_url}/static/resource/online/scripts/jquery.min.js?v={$Think.config.release_version}"></script>
+    <script src="{$Think.config.domain.resource_url}/static/resource/online/scripts/wyrem.js?v={$Think.config.release_version}"></script>
+    <!-- 后退强制刷新解决方案 START -->
+    <script>
+        var getTime = "{:time()}";
+        window.onpageshow = function(){
+            var str = navigator.userAgent;
+            var isiPhone = str.indexOf("iPhone")!=-1;
+            if(isiPhone){
+                var REMOTE_VER = getTime;
+                if(REMOTE_VER){
+                    var LOCAL_VER = sessionStorage && sessionStorage.PAGEVERSION;
+                    if(LOCAL_VER && parseInt(LOCAL_VER) >= parseInt(REMOTE_VER)){
+                        //说明html是从本地缓存中读取的
+                        location.reload(true);
+                    }else{
+                        //说明html是从server端重新生成的，更新LOCAL_VER
+                        sessionStorage.PAGEVERSION = REMOTE_VER;
+                    }
+                }
+            }
+        };
+    </script>
+    <!-- 后退强制刷新解决方案 END -->
+    <style>
+        .ui-flutter {position: absolute; color: #E94F06}
+    </style>
+</head>
+<body>
+<!--页面加载-->
+<div class="loadingpage-container J-page-loading">
+    <div class="loadingpage-container-lodingimg"></div>
+</div>
+<div class="main-container" id="container">
+    <!--当前首页start-->
+    <div class="page index-containter" id="indexPage">
+        <!--搜索到航头start-->
+        <div class="title-nav-content new-nav-content J-header">
+            <div class="logo-new"></div><!--style="background-image: url('{$logo}');"-->
+            <ul class="tabs">
+                <li class="active"><a href="javascript:;">在线点餐</a> </li>
+                <li><a href="">甄选商城</a> </li>
+                <li><a href="">会员卡</a> </li>
+                <li id="toFavoritPage"><a>外带订单</a></li>
+                <li><a class="search"></a></li>
+            </ul>
+            <div class="search-new J-search-placeholder" style="display: none">
+                <div class="icon"></div>
+            </div>
+            <div class="pull-lists">
+                <div class="icon"></div>
+            </div>
+        </div>
+        <!--<div class="pull-list-main">
+            <div class="icon_triangle"></div>
+             <div class="items one">
+                 <a href="javascript:;" class="rank-box">
+                    <span class="icon"></span>
+                    <p>菜品榜单</p>
+                 </a>
+             </div>
+             <div class="items two" id="toFavoritPage">
+                 <a href="javascript:;">
+                    <span class="icon"></span>
+                    <p>我的订单</p>
+                 </a>
+             </div>
+         </div>-->
+        <div class="fix-top">
+            <!--轮播start-->
+            <div class="carousel" style="display:none;">
+                <div class="carousel-wrapper swiper-wrapper"></div>
+                <div class="carousel-pagination">
+                    <div class="carousel-radius"></div>
+                    <div class="carousel-centerbtns"></div>
+                    <div class="carousel-radius"></div>
+                </div>
+            </div>
+            <!--轮播end-->
+            <!-- 优惠卷汇总 -->
+            <div class="layout-coupon">
+                <ul class="icon-start"></ul>
+                <div class="p-txt">
+                    <div class="layout-p">
+                        <p></p>
+                    </div>
+                </div>
+                <div class="btn-arrow-down"></div>
+            </div>
+        </div>
+
+        <!--搜索到航头end-->
+        <div class="index-main-container">
+            <!-- 分类及餐单 -->
+            <div class="layout-dish">
+                <!--分类导航start-->
+                <!--<div style="height:0"></div>-->
+                <div class="tabs-wrapper wrapper J-category-wrapper" id="tabs-wrapper" style="visibility: visible;">
+                    <div class="tabs-wrapper-inner scroller" style="position: relative; zoom: 1;">
+                        <ul class="tabs-lists clearfix J-category-list"></ul>
+                    </div>
+                </div>
+                <!--分类导航end-->
+                <!-- 菜单 -->
+                <div class="layout-food">
+                    <!-- 猜你喜欢 -->
+                    <div class="guess-like J-foodlist" style="display: none;">
+                        <div class="strogeManage">
+                            <span class="strogetj-text">猜你喜欢</span>
+                        </div>
+                        <div class="scroll-guess"></div>
+                    </div>
+                    <!-- end -->
+                    <!-- 分类菜品start -->
+                    <div class="category-foodlists J-category-foodlist J-foodlist">
+
+                    </div>
+                    <!-- 分类菜品end -->
+                </div>
+            </div>
+            <div class="footer-blank"></div>
+        </div>
+    </div>
+    <!--当前首页end-->
+    
+    <!--搜索页面start-->
+    <div class="page search-status-content" id="searchPage" style="display: none;">
+        <div class="search-title-nav-content">
+            <div class="search-title-nav">
+                <div class="search-title-logo fl J-search-close">
+                    <div class="search-title-logo-arrowBg"></div>
+                </div>
+                <div class="search-search-bar fl J-search-bar">
+                    <div class="search-search-bar-box">
+                        <input type="search" class="search-inputs J-search-input" required>
+                        <em class="search-deleicon J-search-clear"></em>
+                        <em class="search-magnifier"></em>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="search-title-results">
+            <!--搜索到的商品start-->
+            <ul class="food-lists-success J-search-list J-foodlist" style="display: none;"></ul>
+            <!--搜索到的商品end-->
+            
+            <!-- 未搜索到start-->
+            <div class="search-failedbgs J-search-empty" style="display: none;">
+                <div class="srarch-faliedimgs"></div>
+            </div>
+            <!-- 未搜索到end -->
+            
+            <!-- 默认搜索的 -->
+            <div class="search-defaultbgs J-search-default">
+                <div class="srarch-defaultimgs"></div>
+            </div>
+        </div>
+        <!-- 店长推荐start -->
+        <div class="recommend-shop J-recommend-wrapper" style="display: none;">
+            <div class="strogeManage">
+                <span class="strogetj-text">店长推荐</span>
+            </div>
+            <!--菜品列表start-->
+            <ul class="food-lists J-recommend-foodlist J-foodlist"></ul>
+            <!--菜品列表end-->
+        </div>
+        <!-- 店长推荐end -->
+        
+        <div class="footer-blank"></div>
+    </div>
+    <!--搜索页面end -->
+    
+    <!--收藏页面start-->
+    <div class="page favorites-content" id="favoritePage" style="display: none;">
+        <div class="rank-header">
+            <div class="rank-back-icon J-favorite-close">
+                <a href="javascript:;"></a>
+            </div>
+            <div class="favorites-delefunc fr J-favorite-clear" style="display: none;">
+                <em class="favorites-deleicon fl"></em>
+                <div class="favorites-allclear fl">全清</div>
+            </div>
+        </div>
+        <div class="rank-body">
+            <div class="favorites-rank-foodlist">
+                <ul class="J-favorite-list J-foodlist"></ul>
+            </div>
+            <div class="J-favorite-empty" style="display:none;">
+                <div class="notfavorites-bg">
+                    <div class="notfavorites-bg-img"></div>
+                </div>
+                <!-- 店长推荐start -->
+                <div class="recommend-shop J-recommend-wrapper">
+                    <div class="strogeManage">
+                        <span class=" strogetj-text">店长推荐</span>
+                    </div>
+                    <ul  class="food-lists J-recommend-foodlist J-foodlist">
+                    
+                    </ul>
+                </div>
+            </div>
+            <div class="footer-blank"></div>
+        </div>
+    </div>
+    <!--收藏页面end-->
+    <!-- 优惠券弹框 -->
+    <div class="mask-couponList">
+        <div class="layout-couponList">
+            <div class="top-img">
+                <div class="img-bg"></div>
+                <div class="shadow"></div>
+            </div>
+            <div class="layout-exit">
+                <div class="btn-coupon-exit"></div>
+            </div>
+            <ul class="mask-star">
+
+            </ul>
+            <h4 class="title-name"><span></span>你好</h4>
+            <div class="coupon-content">
+                <!-- 可用优惠券 -->
+                <div class="coupon usable-coupon dish-coupon-box">
+                    <div class="title">
+                        <span></span>
+                        <p>你有<em></em>张券可用，结账时记得使用哦</p>
+                        <span></span>
+                    </div>
+                    <ul class="usable-couponList dishCoupin">
+
+                    </ul>
+                </div>
+                <!-- 甄选卷 -->
+                <div class="coupon usable-coupon zhenxuan-coupon">
+                    <div class="title">
+                        <span></span>
+                        <p>以下优惠券在甄选商城才可以使用哦</p>
+                        <span></span>
+                    </div>
+                    <ul class="usable-couponList zxCoupin">
+
+                    </ul>
+                    <div class="btn-goZx">去甄选商城看看</div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!--提示框-->
+<div class="ui-tips"></div>
+
+<!--加载框-->
+<div id="loadingToast" style="display: none;">
+    <div class="ui-mask_transparent"></div>
+    <div class="ui-toast">
+        <i class="ui-loading"></i>
+    </div>
+</div>
+
+<!--底部按钮start-->
+<div class="index-footer-text footer-menu index_plate_flash">
+	
+	<!--增加提示内容 first-->
+	<div class="msgs">
+		<p class="zhu">恭喜<label>你</label>，获微信下单<span class="hao">抢豪礼</span>的机会！</p>
+		<p class="zhu">再加<span class="hao"></span>，每桌有1次<span class="hao">抢豪礼</span>的机会！</p>
+		<p class="zhu">活动期间，微信下单<span class="hao">抢豪礼</span>啦！</p>
+	</div>
+	<!--增加提示内容 end-->
+	
+    <div class="footer-menu-disk-r J-cart-bar" style="display:none;">
+        <div class="footer-menu-disk-txt J-cart-total-text"></div>
+        <div class="footer_btn_content">
+            <div class="footer_btn_content_left" style="display:none;">加菜</div>
+            <div class="footer_btn_content_right J-btn-cartsave">选好了</div>
+        </div>
+    </div>
+    <div class="footer-menu-diskContent J-btn-cart">
+        <div class="t">+1</div>
+        <div class="l"></div>
+        <div class="footer-menu-disk-img">
+            <div class="texts J-cart-people-num">1</div>
+        </div>
+        <div class="r"></div>
+    </div>
+    <div class="icon-number J-cart-total-count" style="display: none;"><span>1</span></div>
+</div>
+<!--底部按钮end-->
+
+<!-- banner弹出层start -->
+<div id="bannerDialogBg">
+    <div class="icon-bigmustnew-content icon-detail-attr J-fooddialog-food-tags hide"></div>
+    <div id="bannerDialog" style="display:block;">
+        <div class="banner-foodetail-body">
+            <div>
+                <!-- 菜品图片 -->
+                <div class="fooddetail-img-content banner-fooddetail-img-content">
+                    <div class="fooddetail-img-content-img" >
+                        <div class="J-fooddialog-food-pic"></div>
+                    </div>
+                </div>
+                <!-- 菜品图片 -->
+                <div class="dialogTop banner-dialogTop">
+			        <div class="claseDialogBtn"></div>
+			    </div>
+            </div>
+            <div class="foodcontent">
+                <div class="foodcontent-title">
+                    <span class="J-fooddialog-food-title"></span>
+                </div>
+                <div class="dialog-foodShopFun" style="border-bottom:.1rem solid #eee;">
+                    <div class="foo-list-price food-list-alerticon J-fooddialog-food-price">
+                        
+                    </div>
+                    <div class="food-list-disfull food-list-shoppingCartbtn J-item-console">
+                        <em class="adds J-add-item-banner"></em>
+                    </div>
+                </div>
+                <div class="foodcontent-text foodcontent_color_mt">
+                	<p class="caiName">菜品明细</p>
+                	<dl class="clear dllt">
+
+                    </dl>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+</div>
+<!-- banner弹出层end -->
+<!-- 菜品详情弹出层start -->
+<div id="dialogBg" data-id="">
+    <div class="icon-bigmustnew-content icon-detail-attr J-fooddialog-food-tags hide"></div>
+    <div id="dialog" style="display:block;">
+        <div class="foodetail-body">
+            <div class="foodetail-main-content rel">
+                <!-- 菜品图片 -->
+                <div class="fooddetail-img-content">
+                    <div class="fooddetail-img-content-img" >
+                        <div class="J-fooddialog-food-pic"></div>
+                    </div>
+                </div>
+                <!-- 菜品图片 -->
+                <div class="dialogTop">
+			        <div class="claseDialogBtn"></div>
+			    </div>              
+            </div>
+            <div class="foodcontent">
+                <div class="foodcontent-title">
+                    <span class="J-fooddialog-food-title"></span>
+                    <div class="class-iocn J-fooddialog-food-attrs"></div>
+                    <div class="weighing-tips" style="display: none;"></div>
+                    <div class="foodcontent-title-collection J-btn-favorite"></div>
+                    <div class="special-icon" style="display: none">
+
+                    </div>
+                </div>
+                <div class="dialog-foodShopFun">
+                    <div class="foo-list-price food-list-alerticon J-fooddialog-food-price">
+                    	<span class="food-price-content fl">                 		
+                     	</span>    
+                    </div>
+                    <div class="food-list-disfull food-list-shoppingCartbtn J-item-console">
+                        <em class="adds J-add-item large-add"></em>
+                        <span class="num J-item-num" style="display: none;"></span>
+                        <em class="minus J-remove-item" style="display: none;"></em>
+                        <div class="j-btn-edit J-combo-select" style="display: none;">自由配</div>
+                        <div class="j-btn-taste J-spec-select" style="display: none;">口味定制</div>
+                    </div>
+                </div>
+                <div class="foodcontent-text hide">
+                    <div class="foodcontent-text-font J-fooddialog-food-desc">
+                    </div>
+                </div>                             
+                <div class="foodcontent-dibumark-detail J-remark-content">
+                    <div class="foodcontent-dibumark-detail-beizhu">
+                        <h4 class="h-title">菜品备注</h4>
+                        <textarea style="width:7rem;height:1.1rem;line-height:.35rem;" placeholder="选择忌口备注或自己手动填写" class="J-remark-input"></textarea>                                                                                   
+                        <ul class="J-remark-button clear" style="display: none;">
+                            <li class="J-remark-text">
+                                
+                            </li>
+                        </ul>
+                        <ol class="J-remark-button clear" style="display: none;">
+                        	
+                        </ol>                                                       
+                    </div>
+                </div>
+                
+                <!--备注开始-->
+                <div class="foodcontent-dibumark J-remark-btn">
+                    <div class="foodcontent-dibumark-triangle">菜品详情</div>
+                </div>
+                <div class="foodcontent-text">
+                    <div class="foodcontent-text-font J-fooddialog-food-desc">
+                    </div>
+                </div>
+                <div class="foodcontent-strog"></div>
+                <!--备注 结束-->
+            </div>
+        </div>
+    </div>
+</div>
+<!-- 菜品详情弹出层end -->
+<!-- 餐盘遮罩start -->
+<div class="fooddiskselect J-cart-wrap" id="cart" style="display:none;">
+    <div class="disklistsave">
+    	<div class="rela">
+        <!-- logo -->
+    	<div class="food-logo"></div>
+        <!-- 菜品列表 -->
+        <ul class="J-cart-list" id="listgoods"></ul>
+		</div>
+    </div>
+</div>
+<!-- 餐盘遮罩end -->
+
+<!-- 首页启屏页面start -->
+<div class="start_advertising J-startup-popup">
+    <div class="start_advertising_maincontent">
+        <!--<div class="start_advertising_img J-startup-banner"></div>-->
+        <div class="index_advertisement J-startup-banner" data-type="" data-link="">
+            <img src="" />
+        </div>
+        <div class="start_price">
+            
+        </div>
+        <div class="start_advertising_btn J-startup-btn">加入餐盘</div>
+        <div class="start_advertising_close J-startup-close"></div>
+    </div>
+</div>
+<!-- 首页启屏页面end -->
+
+<!-- 定位错误页面 -->
+<div class="pullMenuFail-container J-page-error" style="display: none; z-index: 4000;">
+    <div class="pullMenuFail-statusimg">
+        <div class="pullMenuFail-img"></div>
+    </div>
+    <div class="pullMenuFail-watingtxt">
+        <p class="J-page-error-content"></p>
+    </div>
+    <div class="pullMenuFail-tips" onClick="window.location.reload();">重新定位</div>
+</div>
+<!--西贝甄选tab栏start-->
+<div class="xb_tab" style="display:none;">
+	<a class="item">
+		<i class="xb_tab_online xb_online_active"></i>
+		<p class="xb_onlineColor_active">在线点餐</p>
+	</a>
+	<a class="item" href="">
+		<i class="xb_tab_select"></i>
+		<p>西贝甄选</p>
+	</a>	
+	<a class="item" href="">
+		<i class="xb_tab_my"></i>
+		<p>个人中心</p>
+	</a>		
+</div>
+<!--西贝甄选tab栏end-->
+<!-- 屏幕横竖提醒start-->
+<!--<div id="orientLayer" class="mod-orient-layer">-->
+    <!--<div class="mod-orient-layer__content">-->
+        <!--<i class="icon mod-orient-layer__icon-orient"></i>-->
+        <!--<div class="mod-orient-layer__desc">为了更好的体验，请使用竖屏浏览</div>-->
+    <!--</div>-->
+<!--</div>-->
+<!--&lt;!&ndash; 屏幕横竖提醒end&ndash;&gt;-->
+
+<!-- 自由配弹框 -->
+<div class="mask-free J-combo-pop">
+    <div class="layout-free">
+        <div class="f-top">
+            <img src="" />
+            <div class="f-top-txt">
+                <h4 class="J-combo-name"></h4>
+                <p class="J-combo-desc"></p>
+            </div>
+            <div class="f-btn-exit"></div>
+        </div>
+        <!-- 内容区域 -->
+        <div class="layout-content">
+            <!-- 标题 -->
+            <div class="f-title">
+                <p>套餐详情</p>
+                <span></span>
+            </div>
+            <div class="f-dialog J-combo-main">
+            
+            </div>
+            <div class="J-combo-select J-combo-vice">
+            
+            </div>
+        </div>
+        <div class="btn-join-plate">
+            <div class="p-left J-combo-price">¥</div>
+            <div class="p-right J-combo-confirm">加入餐盘</div>
+        </div>
+    </div>
+</div>
+<!-- end 自由配弹框 -->
+<!-- 弹框1 -->
+<div class="mask-public single-click" style="display: none">
+    <div class="layout-public">
+        <div class="wx-tips"></div>
+        <div class="txt-area">小伙伴已点过西贝面筋啦， 还要继续添加吗？</div>
+        <div class="click-group">
+            <div class="btn-know">我知道了</div>
+        </div>
+    </div>
+</div>
+
+<!-- 弹框2 -->
+<div class="mask-public double-click">
+    <div class="layout-public">
+        <div class="wx-tips"></div>
+        <div class="txt-area">小伙伴已点过西贝面筋啦， 还要继续添加吗？</div>
+        <div class="click-group">
+            <div class="btn-continue">继续结账</div>
+            <span></span>
+            <div class="btn-know">我知道了</div>
+        </div>
+    </div>
+</div>
+
+<!-- 多规格 -->
+<div class="mask-multi">
+    <div class="mulit-box">
+        <div class="l-box">
+            <div class="del J-remark-cancel"></div>
+            <div class="layout-mulit">
+                <!-- 头部菜品信息 -->
+                <div class="food-top">
+                    <div class="food-img">
+                        <img src="" />
+                    </div>
+                    <div class="food-list-r">
+                        <div class="food-list-title">
+                            <span></span>
+                        </div>
+                        <div class="tip-same-dish txt-description"></div>
+                        <div class="icon-no-spicy">不能免辣</div>
+
+                        <div class="food-list-disfull index_cart J-spec-console" data-foodid="">
+                            <em class="adds J-add-spec"></em>
+                            <span class="num J-item-num" style="display: none;">0</span>
+                            <em class="minus J-remove-spec" style="display: none;"></em>
+                        </div>
+                    </div>
+                </div>
+                <!-- end -->
+                <!-- 选择种类 -->
+                <div class="type-list J-spec-list">
+                    <ul>
+                        <li class="active">牛脊骨</li>
+                        <li>牛胸骨</li>
+                        <li>牛拐骨</li>
+                        <li>牛米龙骨</li>
+                        <li>牛脖骨</li>
+                        <li>牛后棒骨</li>
+                    </ul>
+                </div>
+                <!-- end -->
+            </div>
+            <!-- 选择口味定制 -->
+            <div class="content-detail">
+                <div class="inf">
+                    <span class="title">口味定制</span>
+                </div>
+                <div class="text-a">
+                    <textarea class="textr J-remark-input" placeholder="请输入口味、偏好等要求"></textarea>
+                    <div class="num">
+                        <span class="shu J-remark-length">0</span>/30
+                    </div>
+                </div>
+                <div class="special-button">
+                    <p class="biao"></p>
+                    <ul class="J-remark-button clear ull-a">
+                        <li class="J-remark-text">
+
+                        </li>
+                    </ul>
+                    <ol class="J-remark-button clear ull-b">
+
+                    </ol>
+                </div>
+            </div>
+            <!-- end -->
+            <div class="btn-sureMulti J-spec-submit">确定</div>
+        </div>
+    </div>
+</div>
+<div class="mark-util" style="display: none">
+
+</div>
+
+<script src="{$Think.config.domain.resource_url}/static/resource/online/scripts/jquery.cookie.js?v={$Think.config.release_version}"></script>
+<script src="{$Think.config.domain.resource_url}/static/resource/online/scripts/jquery.lazyload.js?v={$Think.config.release_version}"></script>
+<script src="{$Think.config.domain.resource_url}/static/resource/online/scripts/swiper-3.4.2.jquery.min.js?v={$Think.config.release_version}"></script>
+<script src="{$Think.config.domain.resource_url}/static/resource/online/scripts/jquery.fly.min.js?v={$Think.config.release_version}"></script>
+<script src="{$Think.config.domain.resource_url}/static/resource/online/js/common/utils.js?v={$Think.config.release_version}"></script>
+<script src="{$Think.config.domain.resource_url}/static/resource/online/js/common/config.js?v={$Think.config.release_version}"></script>
+<script src="{$Think.config.domain.resource_url}/static/resource/online/js/common/factory.js?v={$Think.config.release_version}"></script>
+<script src="{$Think.config.domain.resource_url}/static/resource/online/js/common/common.js?v={$Think.config.release_version}"></script>
+<script src="{$Think.config.domain.resource_url}/static/resource/online/js/model/ad.js?v={$Think.config.release_version}"></script>
+<script src="{$Think.config.domain.resource_url}/static/resource/online/js/model/store.js?v={$Think.config.release_version}"></script>
+<script src="{$Think.config.domain.resource_url}/static/resource/online/js/model/user.js?v={$Think.config.release_version}"></script>
+<script src="{$Think.config.domain.resource_url}/static/resource/online/js/model/food.js?v={$Think.config.release_version}"></script>
+<script src="{$Think.config.domain.resource_url}/static/resource/online/js/model/love.js?v={$Think.config.release_version}"></script>
+<script src="{$Think.config.domain.resource_url}/static/resource/online/js/model/activity.js?v={$Think.config.release_version}"></script>
+<script src="{$Think.config.domain.resource_url}/static/resource/online/js/controller/activity.js?v={$Think.config.release_version}"></script>
+<script src="{$Think.config.domain.resource_url}/static/resource/online/js/controller/index.js?v={$Think.config.release_version}"></script>
+<script src="{$Think.config.domain.resource_url}/static/resource/online/scripts/iscroll.js?v={$Think.config.release_version}"></script>
+<script src="{$Think.config.domain.resource_url}/static/resource/online/scripts/navbarscroll.js?v={$Think.config.release_version}"></script>
+<script>
+    var storeId = Util.getUrlParam('store_id');
+    var tableNo = Util.getUrlParam('table_no');
+    var urlType = Util.getUrlParam('type');
+    var from    = Util.getUrlParam('from');
+    var token   = Util.getUrlParam('token');
+
+    indexController.init(storeId, tableNo, token);
+    // 排行榜链接
+    var href='/online/ranking/index?store_id='+self.storeId;
+    // 个人中心跳转链接
+    var memberHref='/online/member/index?store_id='+self.storeId;
+    // 菜品搜索页链接
+    var searchHref = '/online/search/index?store_id=' + self.storeId;
+    //顶部导航
+    var navControl = {
+        init:function(){
+            this.event();
+        },
+        event:function(){
+            var flag = true;
+            $(document).on('touchstart','.pull-lists',function(event){
+                event.stopPropagation();
+                if(flag){
+                    $(this).addClass('active');
+                    $(this).parent().siblings('.pull-list-main').show();
+                    flag = false;
+                }else{
+                    $(this).removeClass('active');
+                    $(this).parent().siblings('.pull-list-main').hide();
+                    flag = true;
+                }
+            })
+            $(document).on('touchstart',function(event){
+                flag = true;
+                var _conp  = $('.pull-list-main');
+                if(!_conp.is(event.target) && _conp.has(event.target).length===0){
+                    $('.pull-list-main').hide();
+                    $('.pull-lists').removeClass('active');
+                }
+            });
+        }
+    }
+    navControl.init();
+
+    if(tableNo){
+        href+='&table_no=' + encodeURIComponent(tableNo) + '&from=eatIn';
+        searchHref+='&table_no=' + encodeURIComponent(tableNo) + '&from=eatIn';
+        memberHref+='&table_no=' + encodeURIComponent(tableNo) + '&from=eatIn';
+    }else{
+        href+='&from=' + from;
+        searchHref+='&from=' + from;
+        memberHref+='&from=' + from;
+    }
+    if(urlType == 'add'){
+        href+='&type=add';
+        searchHref+='&type=add';
+        memberHref+='&type=add';
+    }
+    $('a.rank-box').attr('href',href);
+    $('a.search').attr('href', searchHref);
+    // 排行榜提示
+    if(localStorage.getItem("orderNote")){
+        $('div.personal-center-mainbox').hide();
+    }else{
+        localStorage.setItem("orderNote", true);
+        setTimeout(function(){
+            $('div.personal-center-mainbox').hide();
+        },5000);
+    }
+    $('div.personal-center-mainbox').click(function(){
+        $(this).hide();
+    });
+    // 收藏购物车数量
+    $('ul.J-foodlist').on('click','div.J-food-pic',function(){
+        var num=$(this).parents('li.J-fooditem').find('span.J-item-num').text();
+        $('div#dialogBg').find('span.J-item-num').text(num);
+        if(num==0){
+            $('div#dialogBg').find('span.J-item-num').hide();
+            $('div#dialogBg').find('em.J-remove-item').hide();
+        }
+    });
+
+    var wsUrl = 'ws://127.0.0.1:9508';
+    var websocket = new WebSocket(wsUrl);
+
+    websocket.onopen = function (evt) {
+        var params = {
+            'store_id' : storeId,
+            'table_no' : tableNo,
+            'token' : token,
+            'action': 'init_table',
+        };
+        websocket.send(JSON.stringify(params));
+        console.log("ws client 连接成功！");
+    };
+
+    websocket.onmessage = function (evt) {
+        console.log("ws server return data: " + evt.data);
+        let data = JSON.parse(evt.data);
+        console.log(data);
+        if (data.type == 'food_notify') {
+            // 刷新
+            console.log(data.data);
+            cartController.initTableCart(data.data);
+            console.log('refresh');
+        }
+    };
+
+    websocket.onclose = function (evt) {
+        console.log("connect close");
+    };
+
+    websocket.onerror = function (evt, e) {
+        console.log("error: " + evt.data);
+    }
+</script>
+</body>
+</html>

@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>订单详情页</title>
+    <meta charset=utf-8>
+    <meta name=description content="">
+    <meta name=viewport content="width=device-width, initial-scale=1,user-scalable=no">
+    <link rel="stylesheet" type="text/css" href="{$Think.config.domain.resource_url}/static/resource/online/css/commen.css?v={$Think.config.release_version}">
+    <link rel="stylesheet" type="text/css" href="{$Think.config.domain.resource_url}/static/resource/online/css/reset.css?v={$Think.config.release_version}">
+    <link rel="stylesheet" type="text/css" href="{$Think.config.domain.resource_url}/static/resource/online/css/orderDefine.css?v={$Think.config.release_version}">
+    <link rel="stylesheet" type="text/css" href="{$Think.config.domain.resource_url}/static/resource/online/css/orderDetail.css?v={$Think.config.release_version}">
+    <link rel="stylesheet" type="text/css" href="{$Think.config.domain.resource_url}/static/resource/online/css/index.css?v={$Think.config.release_version}">
+    <link rel="stylesheet" type="text/css" href="{$Think.config.domain.resource_url}/static/resource/online/css/pullMenuFail.css?v={$Think.config.release_version}">
+    <script src="{$Think.config.domain.resource_url}/static/resource/online/scripts/jquery.min.js?v={$Think.config.release_version}"></script>
+    <script src="{$Think.config.domain.resource_url}/static/resource/online/scripts/wyrem.js?v={$Think.config.release_version}"></script>
+</head>
+<body>
+    <!-- 用到index.css 公用按钮部分 -->
+    <div class="orderDefine-content J-order-page" style="display: none;">
+        <div class="orderDefine-header">
+            <div class="orderDefine-headerbg">
+                <div class="orderDefine-headertext J-table-name"></div>
+            </div>
+            <div class="orderDetailbg-bottomline">
+            </div>
+        </div>
+        <div class="orderDetailmesg">
+            <div class="orderDetailmesg-nav">
+                <div class="orderDetailmesg-navtext ">基本信息</div>
+            </div>
+            <div class="orderDetailcontent">
+                <div class="orderDtail-eatperson basemesg">
+                    <div class="orderDetaile-eatmesg">用餐人数</div>
+                    <span class="orderDetail-numbercolor J-order-people"></span>
+                </div>
+                <div class="orderDtail-eatperson  basemesg">
+                    <div class="orderDetaile-eatmesg">下单时间</div>
+                    <span class="orderDetail-numbercolor J-order-time"></span>
+                </div>
+                <div class="orderDtail-eatperson  basemesg">
+                    <div class="orderDetaile-eatmesg">菜品数量</div>
+                    <span class="orderDetail-numbercolor J-order-num"></span>
+                </div>
+            </div>
+        </div>
+        <div class="order-detailcategory">
+            <!-- 立即下单pageStart -->
+            <div class="orderDetailmesg-nav">
+                <div class="orderDetailmesg-navtext ">订单详情</div>
+            </div>
+            <div class="J-cart-wrap" style="display: none;">
+	            <div class="order-immediately">
+	                <!-- 插入列表开始 -->
+	                <div class="order-immediately-inner">
+	                    <ul class="J-cart-list">
+	                        
+	                    </ul>
+	                </div>
+	                <!-- 插入列表结束 -->
+	            </div>
+            </div>
+            <!-- 立即下单pageEnd -->
+            <!-- 订单菜品列表start -->
+            <div class="order-detaillist-content J-order-foods">
+                
+            </div>
+            <!-- 订单菜品列表end -->
+        </div>
+        
+        <div class="footer-menu" style="display:block;">
+            <div class="footer-menu-disk-r">
+                <div class="footer-menu-disk-txt J-cart-info"></div>
+                <div class="footer_btn_content">
+                    <div class="footer_btn_content_left J-btn-add">加菜</div>
+                    <div class="footer_btn_content_right J-btn-pay" style="display: none;">结账</div>
+                    <div class="footer_btn_content_right J-btn-order" style="display: none;">下单</div>
+                </div>
+            </div>
+            <div class="footer-menu-diskContent">
+                <div class="footer-menu-disk-img"></div>
+            </div>
+            <div class="icon-number J-cart-total" style="display:none;"><span>5</span></div>
+        </div>
+        
+    </div>
+    
+    <!--提示框-->
+    <div class="ui-tips"></div>
+    
+    <!--加载框-->
+   	<div id="loadingToast" style="display: none;">
+        <div class="ui-mask_transparent"></div>
+        <div class="ui-toast">
+            <i class="ui-loading"></i>
+        </div>
+    </div>
+    
+    <!-- 定位错误页面 -->
+    <div class="pullMenuFail-container J-page-error" style="position: absolute;left: 0; top: 0;display: none; z-index: 4000;">
+        <div class="pullMenuFail-statusimg">
+            <div class="pullMenuFail-img"></div>
+        </div>
+        <div class="pullMenuFail-watingtxt">
+            <p class="J-page-error-content"></p>
+        </div>
+        <div class="pullMenuFail-tips" onClick="window.location.reload();">重新定位</div>
+    </div>
+    
+    <!-- 屏幕横竖提醒start-->
+    <div id="orientLayer" class="mod-orient-layer">
+        <div class="mod-orient-layer__content">
+            <i class="icon mod-orient-layer__icon-orient"></i>
+            <div class="mod-orient-layer__desc">为了更好的体验，请使用竖屏浏览</div>
+        </div>
+    </div>
+    <!-- 屏幕横竖提醒end-->
+    
+    <script src="//webapi.amap.com/maps?v=1.3&key=bdd9e8e4a83eb6414c0b362dfc883062"></script>
+    <script src="//res.wx.qq.com/open/js/jweixin-1.1.0.js"></script>
+    <script src="{$Think.config.domain.resource_url}/static/resource/online/scripts/jquery.cookie.js?v={$Think.config.release_version}"></script>
+    <script src="{$Think.config.domain.resource_url}/static/resource/online/js/common/utils.js?v={$Think.config.release_version}"></script>
+    <script src="{$Think.config.domain.resource_url}/static/resource/online/js/common/config.js?v={$Think.config.release_version}"></script>
+    <script src="{$Think.config.domain.resource_url}/static/resource/online/js/common/factory.js?v={$Think.config.release_version}"></script>
+    <script src="{$Think.config.domain.resource_url}/static/resource/online/js/common/common.js?v={$Think.config.release_version}"></script>
+    <script src="{$Think.config.domain.resource_url}/static/resource/online/js/model/user.js?v={$Think.config.release_version}"></script>
+    <script src="{$Think.config.domain.resource_url}/static/resource/online/js/model/food.js?v={$Think.config.release_version}"></script>
+    <script src="{$Think.config.domain.resource_url}/static/resource/online/js/model/store.js?v={$Think.config.release_version}"></script>
+    <script src="{$Think.config.domain.resource_url}/static/resource/online/js/model/table.js?v={$Think.config.release_version}"></script>
+    <script src="{$Think.config.domain.resource_url}/static/resource/online/js/model/order.js?v={$Think.config.release_version}"></script>
+    <script src="{$Think.config.domain.resource_url}/static/resource/online/js/controller/order.js?v={$Think.config.release_version}"></script>
+    <script>
+        var storeId = Util.getUrlParam('store_id');
+        var tableId = Util.getUrlParam('table_no');
+        var from = Util.getUrlParam('from');
+        orderController.init(storeId, tableId);
+    </script>
+</body>
+</html>

@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>选择就餐人数</title>
+    <meta charset=utf-8>
+    <meta name=description content="">
+    <meta name=viewport content="width=device-width, initial-scale=1,user-scalable=no">
+    <link rel="stylesheet" type="text/css" href="{$Think.config.domain.resource_url}/static/resource/online/css/reset.css?v={$Think.config.release_version}">
+    <link rel="stylesheet" type="text/css" href="{$Think.config.domain.resource_url}/static/resource/online/css/takeOut.css?v={$Think.config.release_version}">
+    <link rel="stylesheet" type="text/css" href="{$Think.config.domain.resource_url}/static/resource/online/css/commen.css?v={$Think.config.release_version}">
+	<script src="{$Think.config.domain.resource_url}/static/resource/online/scripts/wyrem.js?v={$Think.config.release_version}"></script>
+</head>
+<body>
+<!-- Swiper first -->
+    <div class="swiper-container" style="display: none">
+        <div class="banner"></div>
+        <div class="choose-number"></div>
+    	<div class="slide_m">  	        			        		
+			<div class="meal_num">
+				<div class="new_person">
+					<div class="meal_num_a">成人用餐人数</div>
+					<ul class="meal_num_ula J-people-man">
+						<li>
+							<a href="javascript:;">1</a>
+						</li>
+						<li>
+							<a href="javascript:;">2</a>
+						</li>
+						<li>
+							<a href="javascript:;">3</a>
+						</li>
+						<li>
+							<a href="javascript:;">4</a>
+						</li>
+						<li>
+							<a href="javascript:;">5</a>
+						</li>
+						<li>
+							<a href="javascript:;">6</a>
+						</li>
+						<li>
+							<a href="javascript:;">7</a>
+						</li>
+						<li>
+							<a href="javascript:;">8</a>
+						</li>
+						<li>
+							<a href="javascript:;">9</a>
+						</li>
+						<li>
+							<a href="javascript:;">10</a>
+						</li>
+					</ul>
+					<div class="meal_num_a meal_num_er">儿童用餐人数<span class="sp1">(8岁以下)</span></div>
+					<ul class="meal_num_ula meal_num_ulb J-people-child">
+						<li>
+							<a href="javascript:;">0</a>
+						</li>
+						<li>
+							<a href="javascript:;">1</a>
+						</li>
+						<li>
+							<a href="javascript:;">2</a>
+						</li>
+						<li>
+							<a href="javascript:;">3</a>
+						</li>
+						<li>
+							<a href="javascript:;">4</a>
+						</li>
+						<li>
+							<a href="javascript:;">5</a>
+						</li>
+					</ul>
+					<dl class="meal_or">
+						<!--如果门店没开到店打包，第一个dd不出现，给第二个dd追加一个class,order-w-->
+					</dl>
+				</div>
+			</div>
+        </div>
+    </div>
+<!--提示框-->
+<div class="ui-tips"></div>
+<script src="{$Think.config.domain.resource_url}/static/resource/online/scripts/jquery.min.js"></script>
+<script src="{$Think.config.domain.resource_url}/static/resource/online/js/common/utils.js?v={$Think.config.release_version}"></script>
+<script src="//res.wx.qq.com/open/js/jweixin-1.1.0.js?v={$Think.config.release_version}"></script>
+<script src="{$Think.config.domain.resource_url}/static/resource/online/scripts/jquery.cookie.js?v={$Think.config.release_version}"></script>
+<script src="{$Think.config.domain.resource_url}/static/resource/online/js/common/config.js?v={$Think.config.release_version}"></script>
+<script src="{$Think.config.domain.resource_url}/static/resource/online/js/common/common.js?v={$Think.config.release_version}"></script>
+<script src="{$Think.config.domain.resource_url}/static/resource/online/js/common/factory.js?v={$Think.config.release_version}"></script>
+<script src="{$Think.config.domain.resource_url}/static/resource/online/js/model/order.js?v={$Think.config.release_version}"></script>
+<script src="{$Think.config.domain.resource_url}/static/resource/online/js/model/store.js?v={$Think.config.release_version}"></script>
+<script src="{$Think.config.domain.resource_url}/static/resource/online/js/model/user.js?v={$Think.config.release_version}"></script>
+<script type="text/javascript">
+    var storeId = Util.getUrlParam('store_id');
+    var tableNo = Util.getUrlParam('table_no');
+    var queue = Util.getUrlParam('queue') == null ? 0 : Util.getUrlParam('queue');
+    
+    $(function () {
+        storeModel.getStoreInfo({
+            storeId: storeId,
+            success: function (data) {
+                var html = '';
+                if (data.enabled_takeout) {
+                    html += '<dd class="pick J-but-takeout">到店打包</dd>';
+                    html += '<dd class="order J-but-eatIn">预点餐</dd>';
+                } else {
+                    html += '<dd class="order order-w J-but-eatIn">预点餐</dd>';
+				}
+				
+				orderModel.getPeopleNum({
+                    storeId: storeId,
+					success: function (data) {
+						if (data.man) {
+							$('.J-people-man li').eq(data.man-1).children('a').addClass('active');
+						}
+						if (data.child) {
+                            $('.J-people-child li').eq(data.child).children('a').addClass('active');
+						}
+                    }
+				});
+				
+				$('.meal_or').html(html);
+                $('.swiper-container').show();
+            }
+        });
+
+        $('.J-people-man').on('click', 'li', function(){
+            $(this).siblings('li').children('a').removeClass('active');
+            $(this).children('a').addClass('active');
+        });
+
+        $('.J-people-child').on('click', 'li', function(){
+            $(this).siblings('li').children('a').removeClass('active');
+            $(this).children('a').addClass('active');
+        });
+        
+        $('.J-but-eatIn').click(function (ev) {
+            //取人数
+            var man = parseInt($(".J-people-man").find(".active").text());
+            var child = parseInt($(".J-people-child").find(".active").text());
+            man = isNaN(man) ? 0 : man;
+            child = isNaN(child) ? 0 : child;
+            if (man == 0) {
+                Util.tips('请选择正确用餐人数');
+                return;
+            }
+            
+            sessionStorage.setItem("adult", man);
+            sessionStorage.setItem("child", child);
+            orderModel.commitPeopleNum({
+                man: man,
+                child: child,
+                storeId: storeId,
+                success: function (res) {
+                    if (tableNo !== null) {
+                        window.location.href = PAGE_URL.ONLINE + '?store_id=' + storeId + '&table_no=' + encodeURIComponent(tableNo) + '&from=eatIn';
+                    } else {
+                        window.location.href = PAGE_URL.RESERVE + '?store_id=' + storeId + '&from=reserve&queue=' + queue;
+                    }
+                },
+                error: function (res) {
+                    console.log('请求失败')
+                }
+            });
+        });
+
+        $('.J-but-takeout').click(function () {
+            userModel.getUserInfo(function (data) {
+                sessionStorage.setItem("name", data.name);
+                sessionStorage.setItem("tel", data.phone);
+            });
+            
+            window.location.href = PAGE_URL.TAKEOUT + '?store_id=' + storeId + '&from=takeout';
+        });
+    });
+</script>
+</body>
+</html>

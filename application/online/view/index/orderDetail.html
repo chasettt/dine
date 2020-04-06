@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>订单详情页</title>
+    <meta charset=utf-8>
+    <meta name=description content="">
+    <meta name=viewport content="width=device-width, initial-scale=1,user-scalable=no">
+    <link rel="stylesheet" type="text/css" href="{$Think.config.domain.resource_url}/static/resource/online/css/reset.css?v={$Think.config.release_version}">
+    <link rel="stylesheet" href="{$Think.config.domain.resource_url}/static/resource/online/css/commen.css?v={$Think.config.release_version}"/>
+    <link rel="stylesheet" href="{$Think.config.domain.resource_url}/static/resource/online/css/takeOutDetail.css?v={$Think.config.release_version}"/>
+    <script src="{$Think.config.domain.resource_url}/static/resource/online/scripts/jquery.min.js?v={$Think.config.release_version}"></script>
+    <script src="{$Think.config.domain.resource_url}/static/resource/online/scripts/wyrem.js?v={$Think.config.release_version}"></script>
+</head>
+<body>
+<div class="takeOutDetail">
+    <!--下单成功显示-->
+    <div class="header" style="display:block;">
+        <div class="bgTakeNum bgTakeNum1">
+            <!--loading桌号未取到隐藏-->
+            <!--<div class="tabNum tabNum1" style="display:none;">外卖<span class="no_num">1</span></div>-->
+        </div>
+        <div class="tips"></div>
+    </div>
+    <div class="takeOutDetailBody">
+        <!--基本信息-->
+        <div class="baseInfo infoBox">
+            <div class="title">
+                <p>基本信息</p>
+            </div>
+            <div class="options inner">
+                <div class="orderCode flexSpaceBtn">订单编号: <span class="pl16"></span></div>
+                <div class="orderDate pt36 flexSpaceBtn">下单日期: <span class="pl16"></span></div>
+                <!-- <div class="dishNum pt36 flexSpaceBtn">菜品数量: <span class="pl16"></span></div> -->
+            </div>
+        </div>
+        <!--异常信息-->
+        <div class="abnormalInfo infoBox" style="display: none;">
+            <div class="title e5Color">
+                <p>提示信息<span>(请联系服务员)</span></p>
+            </div>
+            <div class="list inner greyColor">
+            
+            </div>
+        </div>
+        <!--订单详情-->
+        <div class="orderDetail infoBox" style="display: none;">
+            <div class="title">
+                <p>订单详情</p>
+            </div>
+            <div class="list inner">
+            
+            </div>
+        </div>
+        <!--支付信息-->
+        <div class="payInfo infoBox">
+            <div class="title">
+                <p>支付信息</p>
+            </div>
+            <div class="inner">
+                <div class="flexSpaceBtn">积分抵现<span class="pl16" id="credit_amount"></span></div>
+                <div class="flexSpaceBtn pt36">券抵扣金额<span class="pl16" id="coupon_amount"></span></div>
+                <div class="flexSpaceBtn pt36">储值支付<span class="pl16" id="balance_amount"></span></div>
+                <div class="flexSpaceBtn pt36">微信支付<span class="pl16" id="pay_amount"></span></div>
+            </div>
+            <div class="orderUnit">
+                <div class="">订单金额<span></span><i class="e5Color" style="display:block;"></i></div>
+            </div>
+        </div>
+		<!-- <div class="bill">我要开发票</div> -->
+    </div>
+</div>
+<!--loading加载中satrt-->
+<div class="TakeOutLoading">
+    <div class="TakeOutLoadingBg"></div>
+</div>
+<!--loading加载中end-->
+
+<script src="//res.wx.qq.com/open/js/jweixin-1.1.0.js"></script>
+<script src="{$Think.config.domain.resource_url}/static/resource/online/scripts/jquery.cookie.js?v={$Think.config.release_version}"></script>
+<script src="{$Think.config.domain.resource_url}/static/resource/online/js/common/utils.js?v={$Think.config.release_version}"></script>
+<script src="{$Think.config.domain.resource_url}/static/resource/online/js/common/config.js?v={$Think.config.release_version}"></script>
+<script src="{$Think.config.domain.resource_url}/static/resource/online/js/common/factory.js?v={$Think.config.release_version}"></script>
+<script src="{$Think.config.domain.resource_url}/static/resource/online/js/common/common.js?v={$Think.config.release_version}"></script>
+<script src="{$Think.config.domain.resource_url}/static/resource/online/js/controller/ticket.js?v={$Think.config.release_version}"></script>
+<script src="{$Think.config.domain.resource_url}/static/resource/online/js/model/ticket.js?v={$Think.config.release_version}"></script>
+<script type="text/javascript">
+    var token=$.cookie("{:config('cache_keys.oauth_token')}");
+    var order_sn=Util.getUrlParam('order_sn');
+    var store_id=Util.getUrlParam('store_id');
+    var table_id=Util.getUrlParam('table_no');
+    ticketController.init();
+    var from=Util.getUrlParam('from');
+
+//    pushHistory();
+//    window.addEventListener("popstate", function(e) {
+////        回调函数中实现需要的功能,在这里指定其返回的地址
+//        var href='/online/eat?store_id='+store_id+'&table_no='+table_id+'&from=' + from;
+//        window.location.replace(href);
+//    }, false);
+//
+//    function pushHistory() {
+//        var state = {
+//            title: "订单详情页",
+//            url: ''
+//        };
+//        window.history.pushState(state, state.title, state.url);
+//    }
+
+    var timer=setInterval(orderRequest,3000);
+    orderRequest();
+    function orderRequest(){
+        $.ajax({
+            'url':'/api/payment/get?token='+token,
+            'type':'post',
+            'data':{'order_sn':order_sn},
+            'success':function(data){
+                if(data.code != 200){
+                    return false;
+                }
+                var data=data.data;
+                if(data.pay_state == 2){
+                    // 如果没有支付成功,跳转到失败页面
+                    window.location.href='/online/eat/orderFail?order_sn='+order_sn;
+                }else if(data.pay_state == 3){
+                    window.location.href='/online/eat/orderFail?store_id='+store_id+'&order_sn='+order_sn;
+                }
+                if(data.order_state==2 || data.order_state==1){
+                    // 停止轮询
+                    clearInterval(timer);
+                    $('div.TakeOutLoading').hide();
+                    if(data.order_type ==3 && data.pay_state == 1 && data.pay_amount > 0 && (ticketController.now - data.pay_time) < GET_TICKET_TIMES){
+                        $('div.takeOutDetailBody').append('<div class="bill" order_no="' + data.order_no + '" invoice_url="' + data.invoice_url + '">我要开发票</div>');
+                    }
+                }
+                var table_nume = data.table_name;
+                var table_num_text = table_nume.substring(0, 2);
+                var table_num_no    = table_nume.substr(2);
+                $('div.bgTakeNum').html('<div class="tabNum tabNum1">'+table_num_text+'<span class="no_num">'+table_num_no+'</span>'+'</div>')
+                //	$('div.tabNum').text(data.table_name);
+                $('div.orderCode span.pl16').text(data.choice_id);
+                // $('div.dishNum span.pl16').text(data.total_number+'份');
+                $('div.orderDate span.pl16').html(data.order_no.substr(0,4)+'-'+data.order_no.substr(4,2)+'-'+data.order_no.substr(6,2)+' <span>'+data.order_no.substr(8,2)+':'+data.order_no.substr(10,2)+'</span>');
+                $('#credit_amount').text('￥'+data.credit_amount);
+                $('#coupon_amount').text('￥'+data.coupon_amount);
+                $('#balance_amount').text('￥'+data.balance_amount);
+                $('#pay_amount').text('￥'+data.pay_amount);
+                var successHtml='';
+                var failHtml='';
+                var food_state=['未下厨','已下厨'];
+                $.each(data.food_list,function(k,v){
+                    var html='';
+                    html+='<div class="item"><div class="name">'+v.food_name+'</div><div class="num">x'+v.food_number+'</div>';
+                    if(data.member_rules && data.pay_member && v.food_member_price!=v.food_price){
+                        var show_price = (v.food_member_price * 100 - v.food_discount_member *100) / 100;
+                        show_price = show_price.toFixed(2);
+                        html+='<div class="price vip-price">¥' + show_price;
+                    }else{
+                        var show_price = (v.food_price * 100 - v.food_discount * 100) / 100;
+                        show_price = show_price.toFixed(2);
+                        html+='<div class="price">¥' + show_price;
+                    }
+                    $('div.orderUnit i').text('已支付');
+                    if(v.food_weigh==1 && v.food_state==1){
+                        html+='</div><div class="state">需称重</div></div>';
+                        failHtml+=html;
+                    }else if(v.food_state==1 || v.food_state==0){
+                        html+='</div><div class="state">'+food_state[v.food_state]+'</div></div>';
+                        successHtml+=html;
+                    }else if(v.food_state==10){
+                        html+='</div><div class="state">未下厨</div></div>';
+                        failHtml+=html;
+                    }
+                });
+                if(successHtml){
+                    $('div.orderDetail').show();
+                    $('div.orderDetail div.list').html(successHtml);
+                }
+                if(failHtml){
+                    $('div.abnormalInfo').show();
+                    $('div.abnormalInfo div.list').html(failHtml);
+                }else{
+                    $('div.abnormalInfo').hide();
+                    $('div.abnormalInfo div.list').html('');
+                }
+                if(data.member_rules && data.pay_member){
+                    $('div.orderUnit span').text('￥'+data.order_amount_member);
+                }else{
+                    $('div.orderUnit span').text('￥'+data.order_amount);
+                }
+            }
+        });
+    }
+</script>
+
+</body>
+</html>

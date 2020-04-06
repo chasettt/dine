@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>选择就餐方式</title>
+<meta charset=utf-8>
+<meta name=description content="">
+<meta name=viewport content="width=device-width, initial-scale=1,user-scalable=no">
+<link rel="stylesheet" type="text/css" href="/static/resource/online/css/takeOut.css?v={$Think.config.release_version}">
+<link rel="stylesheet" type="text/css" href="/static/resource/online/css/reset.css?v={$Think.config.release_version}">
+</head>
+<body>
+<div class="PreOrdering">
+	<div class="eatStyle">
+		<span class="inner">选择就餐方式</span>
+	</div>
+	<div class="eatSelect">
+		<a class="eatIn sameFont J-but-eatIn">
+			<div class="eatInBg sameBg"></div>
+			<p>店内用餐</p>
+			<span>EAT IN</span>
+		</a>
+		<a class="takeOut sameFont J-but-takeout">
+			<div class="takeOutBg sameBg"></div>
+			<p>打包带走</p>
+			<span>TAKE OUT</span>
+		</a>
+	</div>			
+</div>
+</body>
+<script src="/static/resource/online/scripts/wyrem.js?v={$Think.config.release_version}"></script>
+<script src="/static/resource/online/scripts/jquery.min.js"></script>
+<script src="/static/resource/online/js/common/utils.js?v={$Think.config.release_version}"></script>
+<script src="//res.wx.qq.com/open/js/jweixin-1.1.0.js"></script>
+<script src="/static/resource/online/js/common/config.js?v={$Think.config.release_version}"></script>
+<script src="{$Think.config.domain.resource_url}/static/resource/online/scripts/jquery.cookie.js?v={$Think.config.release_version}"></script>
+<script src="/static/resource/online/js/common/common.js?v={$Think.config.release_version}"></script>
+</html>
+<script type="text/javascript">
+	var storeId = Util.getUrlParam('store_id');
+	var from = Util.getUrlParam('from');
+	
+	$('.J-but-eatIn').click(function () {
+        window.location.href = PAGE_URL.RESERVE + '?store_id=' + storeId + '&from=reserve';
+    });
+
+    $('.J-but-takeout').click(function () {
+        window.location.href = PAGE_URL.TAKEOUT + '?store_id=' + storeId + '&from=takeout';
+    });
+</script>

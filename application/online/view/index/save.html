@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>保存成功</title>
+        <meta charset=utf-8>
+        <meta name=description content="">
+        <meta name=viewport content="width=device-width, initial-scale=1,user-scalable=no">
+        
+        <link rel="stylesheet" type="text/css" href="{$Think.config.domain.resource_url}/static/resource/online/css/commen.css?v={$Think.config.release_version}">
+        <link rel="stylesheet" type="text/css" href="{$Think.config.domain.resource_url}/static/resource/online/css/reset.css?v={$Think.config.release_version}">
+        <link rel="stylesheet" type="text/css" href="{$Think.config.domain.resource_url}/static/resource/online/css/ordSave.css?v={$Think.config.release_version}">
+        
+        <script src="{$Think.config.domain.resource_url}/static/resource/online/scripts/jquery.min.js?v={$Think.config.release_version}"></script>
+        <script src="{$Think.config.domain.resource_url}/static/resource/online/scripts/wyrem.js?v={$Think.config.release_version}"></script>
+    </head>
+    <body>
+        <div class="orderSave-content">
+            <div class="orderSave-codeimg">
+                <div class="orderSave-codeimgitem"></div>
+            </div>
+            <p class="save-text">保存成功</p>
+            <div class="orderSave-tip">
+                <div class="orderSave-text">
+                    <p>就座后,<span>扫描桌上二维码</span>下单</p>
+                </div>
+            </div>
+            <div class="orderSave-tipbtns">
+                <div class="orderSave-tipbtnsitem">
+                    <div class="orderSave-tipbtnsscan J-btn-scan">扫一扫</div>
+                    <div class="orderSave-tipbtnsreturn J-btn-back">返回首页</div>
+                </div>
+            </div>
+            <div class="orderSave-showscan"></div>
+        </div>
+        <!-- 屏幕横竖提醒start-->
+        <div id="orientLayer" class="mod-orient-layer">
+            <div class="mod-orient-layer__content">
+                <i class="icon mod-orient-layer__icon-orient"></i>
+                <div class="mod-orient-layer__desc">为了更好的体验，请使用竖屏浏览</div>
+            </div>
+        </div>
+        <!-- 屏幕横竖提醒end-->
+        <script src="{$Think.config.domain.resource_url}/static/resource/online/scripts/jquery.cookie.js?v={$Think.config.release_version}"></script>
+        <script src="https://res.wx.qq.com/open/js/jweixin-1.1.0.js?v={$Think.config.release_version}"></script>
+        <script src="{$Think.config.domain.resource_url}/static/resource/online/js/common/utils.js?v={$Think.config.release_version}"></script>
+        <script src="{$Think.config.domain.resource_url}/static/resource/online/js/common/config.js?v={$Think.config.release_version}"></script>
+        <script src="{$Think.config.domain.resource_url}/static/resource/online/js/common/common.js?v={$Think.config.release_version}"></script>
+        <script>
+            $(document).ready(function(){
+                // 扫码
+                $('.J-btn-scan').click(function() {
+                    wx.scanQRCode({
+                        needResult : 0, // 默认为0，扫描结果由微信处理，1则直接返回扫描结果，
+                        scanType : [ "qrCode"], // 可以指定扫二维码还是一维码，默认二者都有
+                    });
+                });
+
+                // 返回
+                $('.J-btn-back').click(function(){
+                    var storeId = Util.getUrlParam('store_id');
+                    var from = Util.getUrlParam('from');
+                    window.location.href = PAGE_URL.INDEX + '?store_id=' + storeId + '&from=' + from;
+                })
+            })
+        </script>
+    </body>
+</html>
