@@ -6,5 +6,5 @@
  * Time: 4:03 AM
  */
 return [
-    'choice_url' => 'api.xibeidev.com',
+    'choice_url' => \think\Facade\Env::get('choice_url'),
 ];

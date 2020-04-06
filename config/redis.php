@@ -9,7 +9,7 @@
 return [
     'db'          => 1,
     'prefix'      => 'online',
-    'host'        => '101.200.45.120',
+    'host'        => \think\Env::get('redis.host'),
     'port'        => 6379,
     'password'    => '',
     'rule'        => true,
