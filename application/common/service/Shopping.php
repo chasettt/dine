@@ -1,4 +1,5 @@
 <?php
+
 namespace app\common\service;
 
 use lib\Redis;
@@ -21,24 +22,27 @@ class Shopping
     public function getUserCart($openid, $storeId)
     {
         // 购物车信息
-        $cartList = $this->_getCache(config('cache_keys.shopping_cart') . ":{$storeId}:{$openid}");
-        $foodCode = $this->_getFoodCode($storeId);
+        $cartList = $this->getCache(config('cache_keys.shopping_cart') . ":{$storeId}:{$openid}");
+        $foodCode = $this->getFoodCode($storeId);
         $result   = [];
         if (!empty($foodCode) and false !== $cartList) {
-            $userFilter = $this->_filter($foodCode, $cartList['details']);
+            $userFilter = $this->filter($foodCode, $cartList['details']);
             if (!empty($userFilter)) {
+                $wg = new \Swoole\Coroutine\WaitGroup();
+
                 foreach ($userFilter as $key => &$item) {
-                    $foodInfo = $this->_getCache(config('cache_keys.store_menu_dish') . ":{$storeId}:{$item['food_code']}");
-                    if (false !== $foodInfo) {
-                        if (isset($item['diy']) and $item['diy'] == 1) {
-                            $foodInfo['food_member_price'] = $foodInfo['food_price'] = 0;
-                            foreach ($item['combo_detail'] as $value) {
-                                $foodInfo['food_member_price'] = $foodInfo['food_price'] += $value['num'] * $value['price'];
-                            }
+                    $wg->add();
+                    go(function () use ($wg, &$item, $storeId) {
+                        $foodInfo = $this->getCache(
+                            config('cache_keys.store_menu_dish') . ":{$storeId}:{$item['food_code']}"
+                        );
+                        if (false !== $foodInfo) {
+                            $item = array_merge($item, $foodInfo);
                         }
-                        $item = array_merge($item, $foodInfo);
-                    }
+                        $wg->done();
+                    });
                 }
+                $wg->wait();
                 //add
                 $result['details'] = $userFilter;
             }
@@ -50,25 +54,25 @@ class Shopping
     public function getTakeawayCart($openid, $storeId, $takeaway)
     {
         // 购物车信息
-        $cartList = $this->_getCache(config('cache_keys.shopping_cart') . ":{$storeId}:{$openid}");
-        $foodCode = $this->_getTakeawayFoodCode($takeaway);
+        $cartList = $this->getCache(config('cache_keys.shopping_cart') . ":{$storeId}:{$openid}");
+        $foodCode = $this->getTakeawayFoodCode($takeaway);
         $result   = [];
 
         if (!empty($foodCode) and false !== $cartList) {
-            $userFilter = $this->_filter($foodCode, $cartList['details']);
+            $userFilter = $this->filter($foodCode, $cartList['details']);
             if (!empty($userFilter)) {
                 // 这里直接查库，缓存只是用于堂食，避免外带的菜品也要加到堂食的餐单中
                 $condition['store_code'] = ['in', $storeId];
                 $condition['food_code']  = ['in', array_column($userFilter, 'food_code')];
-                $foodList = model('common/food')->where($condition)->select()->toArray();
-//                foreach ($userFilter as $key => &$item) {
-//                    $foodInfo = $this->_getCache(config('cache_keys.store_menu_dish') . ":{$storeId}:{$item['food_code']}");
-//                    if (false !== $foodInfo) {
-//                        $item = array_merge($item, $foodInfo);
-//                    }
-//                }
+                $foodList                = model('common/food')->where($condition)->select()->toArray();
+                //                foreach ($userFilter as $key => &$item) {
+                //                    $foodInfo = $this->_getCache(config('cache_keys.store_menu_dish') . ":{$storeId}:{$item['food_code']}");
+                //                    if (false !== $foodInfo) {
+                //                        $item = array_merge($item, $foodInfo);
+                //                    }
+                //                }
                 foreach ($foodList as &$food) {
-                    $food['food_attrs'] = json_decode($food['food_attrs'], true);
+                    $food['food_attrs']             = json_decode($food['food_attrs'], true);
                     $userFilter[$food['food_code']] = array_merge($userFilter[$food['food_code']], $food);
                 }
                 $result = $userFilter;
@@ -86,55 +90,37 @@ class Shopping
      */
     public function getTableUserCart($storeId, $tableNo, $openid = '')
     {
-        $shoppingTableInfo = $this->_getCache(config('cache_keys.table_shopping_cart') . ":{$storeId}:{$tableNo}");
-        $tableInfo         = $this->_getCache(config('cache_keys.table_info') . ":{$storeId}:{$tableNo}");
+        $shoppingTableInfo = $this->getCache(config('cache_keys.table_shopping_cart') . ":{$storeId}:{$tableNo}");
+        //        $tableInfo         = $this->_getCache(config('cache_keys.table_info') . ":{$storeId}:{$tableNo}");
 
         if (false == $shoppingTableInfo && $openid != null && !empty($openid)) {
-//            \think\Log::error('查询table_shopping_cart缓存为空');
             return false;
         }
 
         if (!empty($openid) && !in_array($openid, $shoppingTableInfo)) {
-//            \think\Log::error('报警:' . print_r($log, true));
             return false;
         }
 
         $tableUserCart = [];
+
         foreach ($shoppingTableInfo as $item) {
             // 购物车
-            $userCart = $this->getUserCart($item, $storeId);
-
-            if (!empty($userCart)) {
-                foreach ($userCart['details'] as &$detail) {
-
-                    if (!empty($tableInfo) and $tableInfo['type_id'] == config('room.type')) {
-                        $detail['food_price']        = $detail['food_room_price'];
-                        $detail['food_member_price'] = $detail['food_room_member_price'];
-                    }
-                    unset($detail['food_room_price']);
-                    unset($detail['food_room_member_price']);
-                }
-            }
-
-            $tableUserCart[$item]['shopping'] = isset($userCart['details']) ? $userCart['details'] : [];
+            $userCart                         = $this->getUserCart($item, $storeId);
+            $tableUserCart[$item]['shopping'] = $userCart['details'] ?? [];
             $tableUserCart[$item]['user']     = $this->getUserInfo($item);// 用户信息
-//            $tableUserCart[$item]['classes']  = empty($menuInfo)?[]:$menuInfo;
-
-            //多人点餐提示文字
-            if (!empty($openid) && $item == $openid) {
-                $shoppingCartText             = $this->_getCache(config('cache_keys.people_order_text') . ":{$storeId}:{$tableNo}:{$openid}");
-                $tableUserCart[$item]['text'] = is_array($shoppingCartText) ? end($shoppingCartText) : '';
-                //读取后，清空本人多人点餐提示文字
-                if (!empty($shoppingCartText)) {
-                    $data[] = '';
-                    $this->_saveCache(config('cache_keys.people_order_text') . ":{$storeId}:{$tableNo}:{$openid}", $data, config('cache_keys.people_order_cache_time'));
-                }
-            }
+            //            //多人点餐提示文字
+            //            if (!empty($openid) && $item == $openid) {
+            //                $shoppingCartText             = $this->_getCache(config('cache_keys.people_order_text') . ":{$storeId}:{$tableNo}:{$openid}");
+            //                $tableUserCart[$item]['text'] = is_array($shoppingCartText) ? end($shoppingCartText) : '';
+            //                //读取后，清空本人多人点餐提示文字
+            //                if (!empty($shoppingCartText)) {
+            //                    $data[] = '';
+            //                    $this->_saveCache(config('cache_keys.people_order_text') . ":{$storeId}:{$tableNo}:{$openid}", $data, config('cache_keys.people_order_cache_time'));
+            //                }
+            //            }
         }
 
         return $tableUserCart;
-
-//        return [];
     }
 
     /**
@@ -147,7 +133,7 @@ class Shopping
     public function addFood($storeId, $openid, $food, $tableId = '', $isMultiCombo = 0)
     {
         $cartName = config('cache_keys.shopping_cart') . ":{$storeId}:{$openid}";
-        $cartInfo = $this->_getCache($cartName);
+        $cartInfo = $this->getCache($cartName);
 
         if (false == $cartInfo) {
             $cartInfo['source'] = $food['source'];
@@ -170,11 +156,11 @@ class Shopping
                     'diy'               => 0,
                 ];
             }
-//            $cartInfo['details'][$food['food_code']] = [
-//                'food_code'   => $food['food_code'],
-//                'food_number' => $food['food_number'],
-//                'food_remark' => $food['food_remark'],
-//            ];
+            //            $cartInfo['details'][$food['food_code']] = [
+            //                'food_code'   => $food['food_code'],
+            //                'food_number' => $food['food_number'],
+            //                'food_remark' => $food['food_remark'],
+            //            ];
             // $cartInfo['remark'] = $food['order_remark'];
         } else {
             if (0 == $isMultiCombo) {
@@ -226,26 +212,7 @@ class Shopping
                 }
             }
         }
-        $this->_saveCache($cartName, $cartInfo, get_future_time());
-
-        //多人点餐提示文字
-        if ($food['source'] == 'online' && !empty($tableId)) { //在线点餐堂食
-
-            $userInfo  = $this->getUserInfo($openid);
-            $data[]    = $userInfo['nickname'] . "加了1份菜，您想加点什么";
-            $tableInfo = $this->_getCache(config('cache_keys.table_shopping_cart') . ":{$storeId}:{$tableId}");
-            if (false != $tableInfo and false !== $keys = array_search($openid, $tableInfo)) {
-                unset($tableInfo[$keys]);
-                if (!empty($tableInfo)) {
-                    foreach ($tableInfo as $item) {
-                        $this->_saveCache(config('cache_keys.people_order_text') . ":{$storeId}:{$tableId}:{$item}", $data, config('cache_keys.people_order_cache_time'));
-                    }
-                }
-            }
-
-        }
-
-        //多人点餐提示文字 end
+        $this->saveCache($cartName, $cartInfo, get_future_time());
 
         return true;
     }
@@ -259,7 +226,7 @@ class Shopping
     public function addMulti($openid, $source, $storeCode, $foodCode, $foodNumber = 1)
     {
         $cartName = config('cache_keys.shopping_cart') . ":{$storeCode}:{$openid}";
-        $cartInfo = $this->_getCache($cartName);
+        $cartInfo = $this->getCache($cartName);
 
         if (empty($cartInfo['details'])) {
             // 全新添加
@@ -276,13 +243,13 @@ class Shopping
                 $cartInfo['details'][$code] = $food;
             }
 
-            return $this->_saveCache($cartName, $cartInfo, get_future_time());
+            return $this->saveCache($cartName, $cartInfo, get_future_time());
         } else {
             $foodKeys = array_keys($cartInfo['details']);
             foreach ($foodCode as $code) {
                 if (in_array($code, $foodKeys)) {
                     // 购物车已有该菜品
-                    $food['food_code'] = $code;
+                    $food['food_code']                         = $code;
                     $cartInfo['details'][$code]['food_number'] += $foodNumber;
                 } else {
                     $food = [];
@@ -298,7 +265,7 @@ class Shopping
                 }
             }
 
-            return $this->_saveCache($cartName, $cartInfo, get_future_time());
+            return $this->saveCache($cartName, $cartInfo, get_future_time());
         }
     }
 
@@ -313,7 +280,7 @@ class Shopping
     public function addFastFood($storeId, $openid, $food, $isMultiCombo = 0)
     {
         $cartName = config('cache_keys.shopping_cart') . ":{$storeId}:{$openid}";
-        $cartInfo = $this->_getCache($cartName);
+        $cartInfo = $this->getCache($cartName);
 
         if (false == $cartInfo) {
             $cartInfo['source'] = $food['source'];
@@ -390,7 +357,7 @@ class Shopping
                 }
             }
         }
-        $this->_saveCache($cartName, $cartInfo, get_future_time());
+        $this->saveCache($cartName, $cartInfo, get_future_time());
 
         return true;
     }
@@ -406,39 +373,38 @@ class Shopping
     {
         // 检测用户是否在该台位
         $tableName = config('cache_keys.table_shopping_cart') . ":{$storeId}:{$tableNo}";
-//        $tableTime = config('cache_keys.table_shopping_cache_time');
-
-        $tableList = $this->_getCache($tableName);
+        $tableList = $this->getCache($tableName);
 
         //多人点餐提示信息
         if (empty($tableList)) {
             //第一个用户进入台位
             $text[] = '快邀请同桌一起扫码点餐';
-            $this->_saveCache(config('cache_keys.people_order_text') . ":{$storeId}:{$tableNo}:{$openid}", $text, config('cache_keys.people_order_cache_time'));
+            $this->saveCache(config('cache_keys.people_order_text') . ":{$storeId}:{$tableNo}:{$openid}", $text, config('cache_keys.people_order_cache_time')
+            );
         } elseif (!in_array($openid, $tableList)) {
             //非第一个用户进入台位
-            $userInfo = $this->getUserInfo($openid);
-            $text[]   = $userInfo['nickname'] . '进入扫码点餐模式';
-            $this->_saveCache(config('cache_keys.people_order_text') . ":{$storeId}:{$tableNo}:{$openid}", $text, config('cache_keys.people_order_cache_time'));
+            //            $userInfo = $this->getUserInfo($openid);
+            $text[] = session('users.nickname') . '进入扫码点餐模式';
+            $this->saveCache(config('cache_keys.people_order_text') . ":{$storeId}:{$tableNo}:{$openid}", $text, config('cache_keys.people_order_cache_time'));
 
             //增加文字至该台位关联的所有人
             foreach ($tableList as $tableUser) {
-                $this->_saveCache(config('cache_keys.people_order_text') . ":{$storeId}:{$tableNo}:{$tableUser}", $text, config('cache_keys.people_order_cache_time'));
+                $this->saveCache(config('cache_keys.people_order_text') . ":{$storeId}:{$tableNo}:{$tableUser}", $text, config('cache_keys.people_order_cache_time'));
             }
         }
         //多人点餐提示信息 end
 
         if (false == $tableList) {
-            $this->_checkUserTable($storeId, $tableNo, $openid);
-            $this->_saveCache($tableName, [$openid], config('cache_keys.table_shopping_cache_time'));
+            $this->checkUserTable($storeId, $tableNo, $openid);
+            $this->saveCache($tableName, [$openid], config('cache_keys.table_shopping_cache_time'));
 
             return true;
         }
 
         if (true != in_array($openid, $tableList)) {
             $tableList[] = $openid;
-            $this->_checkUserTable($storeId, $tableNo, $openid);
-            $this->_saveCache($tableName, $tableList, config('cache_keys.table_shopping_cache_time'));
+            $this->checkUserTable($storeId, $tableNo, $openid);
+            $this->saveCache($tableName, $tableList, config('cache_keys.table_shopping_cache_time'));
 
             return true;
         }
@@ -446,7 +412,9 @@ class Shopping
 
         // 如果openid在table_shopping_cart中，更新user_store_table_label
         // 这里是必须的，否则进入其他台位时，不会删除在这个台位上的table_shopping_cart中的openid
-        $this->_saveCache(config('cache_keys.user_store_table_label') . ":{$openid}", $storeId . ':' . $tableNo, get_future_time());
+        $this->saveCache(
+            config('cache_keys.user_store_table_label') . ":{$openid}", $storeId . ':' . $tableNo, get_future_time()
+        );
 
         return true;
     }
@@ -461,7 +429,7 @@ class Shopping
     public function delFood($storeId, $openid, $food, $isMultiCombo = 0)
     {
         $cartName = config('cache_keys.shopping_cart') . ":{$storeId}:{$openid}";
-        $cartInfo = $this->_getCache($cartName);
+        $cartInfo = $this->getCache($cartName);
 
         if (false == $cartInfo) {
             return false;
@@ -483,9 +451,9 @@ class Shopping
         }
 
         if (empty($cartInfo['details'])) {
-            $this->_delCache($cartName);
+            $this->delCache($cartName);
         } else {
-            $this->_saveCache($cartName, $cartInfo, get_future_time());
+            $this->saveCache($cartName, $cartInfo, get_future_time());
         }
 
         return true;
@@ -502,7 +470,7 @@ class Shopping
     public function delFastFood($storeId, $openid, $food, $isMultiCombo = 0)
     {
         $cartName = config('cache_keys.shopping_cart') . ":{$storeId}:{$openid}";
-        $cartInfo = $this->_getCache($cartName);
+        $cartInfo = $this->getCache($cartName);
 
         if (false == $cartInfo) {
             return false;
@@ -524,9 +492,9 @@ class Shopping
         }
 
         if (empty($cartInfo['details'])) {
-            $this->_delCache($cartName);
+            $this->delCache($cartName);
         } else {
-            $this->_saveCache($cartName, $cartInfo, get_future_time());
+            $this->saveCache($cartName, $cartInfo, get_future_time());
         }
 
         return true;
@@ -541,10 +509,7 @@ class Shopping
     public function clearUserCart($storeId, $openid)
     {
         $cartName = config('cache_keys.shopping_cart') . ":{$storeId}:{$openid}";
-//        $cartInfo = $this->_getCache($cartName);
-//        if (false !== $cartInfo) {
-        $this->_delCache($cartName);
-//        }
+        $this->delCache($cartName);
 
         return true;
     }
@@ -558,7 +523,7 @@ class Shopping
     public function clearTableCart($storeId, $tableNo)
     {
         $tableName = config('cache_keys.table_shopping_cart') . ":{$storeId}:{$tableNo}";
-        $tableList = $this->_getCache($tableName);
+        $tableList = $this->getCache($tableName);
 
         if (false !== $tableList) {
             foreach ($tableList as $openid) {
@@ -578,7 +543,7 @@ class Shopping
     public function clearTableShoppingCart($storeId, $tableNo)
     {
         $tableName = config('cache_keys.table_shopping_cart') . ":{$storeId}:{$tableNo}";
-        $this->_delCache($tableName);
+        $this->delCache($tableName);
 
         return true;
     }
@@ -593,18 +558,18 @@ class Shopping
     public function remark($storeId, $openid, $food, $isMultiCombo = 0)
     {
         $cartName = config('cache_keys.shopping_cart') . ":{$storeId}:{$openid}";
-        $cartInfo = $this->_getCache($cartName);
+        $cartInfo = $this->getCache($cartName);
         if (false !== $cartInfo) {
             if (0 == $isMultiCombo) {
                 if (true == array_key_exists($food['food_code'], $cartInfo['details'])) {
                     $cartInfo['details'][$food['food_code']]['food_remark'] = $food['food_remark'];
-                    $this->_saveCache($cartName, $cartInfo, get_future_time());
+                    $this->saveCache($cartName, $cartInfo, get_future_time());
 
                     return true;
                 }
             } elseif (1 == $isMultiCombo && isset($cartInfo['details'][$food['combo_key']])) {
                 $cartInfo['details'][$food['combo_key']]['food_remark'] = $food['food_remark'];
-                $this->_saveCache($cartName, $cartInfo, get_future_time());
+                $this->saveCache($cartName, $cartInfo, get_future_time());
 
                 return true;
             }
@@ -624,19 +589,19 @@ class Shopping
     public function remarkFastfood($storeId, $openid, $food, $isMultiCombo = 0)
     {
         $cartName = config('cache_keys.shopping_cart') . ":{$storeId}:{$openid}";
-        $cartInfo = $this->_getCache($cartName);
+        $cartInfo = $this->getCache($cartName);
         if (false !== $cartInfo) {
             if (1 == $isMultiCombo) {
                 if (true == array_key_exists($food['combo_key'], $cartInfo['details'])) {
                     $cartInfo['details'][$food['combo_key']]['food_remark'] = $food['food_remark'];
-                    $this->_saveCache($cartName, $cartInfo, get_future_time());
+                    $this->saveCache($cartName, $cartInfo, get_future_time());
 
                     return true;
                 }
             } elseif (0 == $isMultiCombo) {
                 if (true == array_key_exists($food['food_code'], $cartInfo['details'])) {
                     $cartInfo['details'][$food['food_code']]['food_remark'] = $food['food_remark'];
-                    $this->_saveCache($cartName, $cartInfo, get_future_time());
+                    $this->saveCache($cartName, $cartInfo, get_future_time());
 
                     return true;
                 }
@@ -656,10 +621,10 @@ class Shopping
     public function orderRemark($storeId, $openid, $remark)
     {
         $cartName = config('cache_keys.shopping_cart') . ":{$storeId}:{$openid}";
-        $cartInfo = $this->_getCache($cartName);
+        $cartInfo = $this->getCache($cartName);
         if (false !== $cartInfo) {
             $cartInfo['remark'] = $remark['order_remark'];
-            $this->_saveCache($cartName, $cartInfo, get_future_time());
+            $this->saveCache($cartName, $cartInfo, get_future_time());
 
             return true;
         }
@@ -674,7 +639,7 @@ class Shopping
             'man'   => $man,
             'child' => $child,
         ];
-        $this->_saveCache($cartName, $cartInfo, get_future_time());
+        $this->saveCache($cartName, $cartInfo, get_future_time());
 
         return true;
     }
@@ -682,7 +647,7 @@ class Shopping
     public function getPeopleNum($storeId, $openid)
     {
         $cartName = config('cache_keys.shopping_cart_people') . ":{$storeId}:{$openid}";
-        $cartInfo = $this->_getCache($cartName);
+        $cartInfo = $this->getCache($cartName);
         if (false !== $cartInfo) {
             return $cartInfo;
         }
@@ -695,31 +660,15 @@ class Shopping
      * @param $storeId
      * @return array
      */
-    private function _getFoodCode($storeId)
+    private function getFoodCode($storeId)
     {
         // 优化，直接取门店菜品列表缓存，不用处理餐单
-        $storeFoods = $this->_getCache(config('cache_keys.store_menu_dish_code') . ":{$storeId}");
-        if (empty($storeFoods)) {
-            return [];
-        }
+        $storeFoods = $this->getCache(config('cache_keys.store_menu_dish_code') . ":{$storeId}");
 
-        return array_unique($storeFoods);
-    //        $menuList = $this->_getCache(config('cache_keys.store_menu') . ":{$storeId}");
-    //        if (false !== $menuList) {
-    //            $foodCodeList = [];
-    //            foreach ($menuList as $classesInfo) {
-    //                if (!empty($classesInfo['food_list'])) {
-    //                    $foodCodeList = array_merge($foodCodeList, array_column($classesInfo['food_list'], 'food_code'));
-    //                }
-    //            }
-    //
-    //            return array_unique($foodCodeList);
-    //        }
-    //
-    //        return [];
+        return empty($storeId) ? [] : array_unique($storeFoods);
     }
 
-    private function _getTakeawayFoodCode($takeaway)
+    private function getTakeawayFoodCode($takeaway)
     {
         $menuList = model('common/takeawayMenu')->getFoodList([
             'takeaway_id' => $takeaway,
@@ -736,7 +685,7 @@ class Shopping
 
     public function getUserInfo($openid)
     {
-        $userInfo = $this->_getCache(config('cache_keys.user_info') . ":{$openid}");
+        $userInfo = $this->getCache(config('cache_keys.user_info') . ":{$openid}");
         if (false === $userInfo) {
             $userInfo = model('common/users', 'service')->getUserInfo($openid);
         }
@@ -758,27 +707,27 @@ class Shopping
      * @param $openid
      * @return bool
      */
-    private function _checkUserTable($storeId, $tableNo, $openid)
+    private function checkUserTable($storeId, $tableNo, $openid)
     {
         $labelName = config('cache_keys.user_store_table_label') . ":{$openid}";
         $labelTime = config('cache_keys.table_shopping_cache_time');
         $tableName = config('cache_keys.table_shopping_cart');
         $tableTime = config('cache_keys.table_shopping_cache_time');
 
-        $userLabel = $this->_getCache($labelName);
+        $userLabel = $this->getCache($labelName);
         $tableStr  = $storeId . ':' . $tableNo;
 
         if (false == $userLabel) {
-            $this->_saveCache($labelName, $tableStr, $labelTime);
+            $this->saveCache($labelName, $tableStr, $labelTime);
 
             return true;
         }
 
         if ($tableStr != $userLabel) {
             // 获取台位信息
-            $tableInfo = $this->_getCache($tableName . ":{$userLabel}");
+            $tableInfo = $this->getCache($tableName . ":{$userLabel}");
             if (false != $tableInfo and false !== $keys = array_search($openid, $tableInfo)) {
-//                unset($tableInfo[$keys]);
+                //                unset($tableInfo[$keys]);
                 // 防止有多个相同的openid存在
                 foreach ($tableInfo as $key => $table) {
                     if ($table == $openid) {
@@ -787,12 +736,12 @@ class Shopping
                 }
 
                 if (empty($tableInfo)) {
-                    $this->_delCache($tableName . ":{$userLabel}");
+                    $this->delCache($tableName . ":{$userLabel}");
                 } else {
-                    $this->_saveCache($tableName . ":{$userLabel}", $tableInfo, $tableTime);
+                    $this->saveCache($tableName . ":{$userLabel}", $tableInfo, $tableTime);
                 }
             }
-            $this->_saveCache($labelName, $tableStr, $labelTime);
+            $this->saveCache($labelName, $tableStr, $labelTime);
         }
 
         return true;
@@ -804,7 +753,7 @@ class Shopping
      * @param $orderFoodList
      * @return array
      */
-    private function _filter($foodCodeList, $orderFoodList)
+    private function filter($foodCodeList, $orderFoodList)
     {
         if (!empty($foodCodeList) and !empty($orderFoodList)) {
             foreach ($orderFoodList as $item) {
@@ -819,28 +768,13 @@ class Shopping
         return [];
     }
 
-    /**
-     * 对象单例
-     * @param $name
-     * @return Redis
-     */
-    private function _checkCache($name = 'redis')
-    {
-        if (!isset(self::$instance[$name]) or !self::$instance[$name]) {
-            self::$instance[$name] = new Redis();
-
-            return self::$instance[$name];
-        }
-
-        return self::$instance[$name];
-    }
 
     /**
      * get redis
      * @param $cacheName
      * @return mixed
      */
-    private function _getCache($cacheName)
+    private function getCache($cacheName)
     {
         return Redis::getInstance()->get($cacheName);
     }
@@ -853,7 +787,7 @@ class Shopping
      * @param null $cacheTime
      * @return mixed
      */
-    private function _saveCache($cacheName = '', $data = [], $cacheTime = null)
+    private function saveCache($cacheName = '', $data = [], $cacheTime = null)
     {
         return Redis::getInstance()->set($cacheName, $data, $cacheTime);
     }
@@ -863,7 +797,7 @@ class Shopping
      * @param $cacheName
      * @return int
      */
-    private function _delCache($cacheName)
+    private function delCache($cacheName)
     {
         return Redis::getInstance()->del($cacheName);
     }

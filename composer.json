@@ -20,7 +20,8 @@
         "topthink/framework": "5.1.*",
         "topthink/think-swoole": "2.0.*",
         "topthink/think-queue": "2.0.4",
-        "yansongda/pay": "^2.9"
+        "yansongda/pay": "^2.9",
+        "firebase/php-jwt": "^5.2"
     },
     "autoload": {
         "psr-4": {

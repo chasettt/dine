@@ -731,6 +731,9 @@
             console.log(data.data);
             cartController.initTableCart(data.data);
             console.log('refresh');
+        } else if (data.type == 'message_notify') {
+            console.log(data.data);
+            cartController.refreshCartText(data.data);
         }
     };
 

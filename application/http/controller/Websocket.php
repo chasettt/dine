@@ -10,6 +10,7 @@ namespace app\http\controller;
 
 use lib\Redis;
 use think\swoole\Server;
+use app\common\service\Cart;
 
 class Websocket extends Server
 {
@@ -39,18 +40,21 @@ class Websocket extends Server
         $data = json_decode($frame->data, true);
         dump($data);
         $fd = $frame->fd;
+        $cartService = new Cart();
 
         switch ($data['action']) {
             case 'food_add':
-                $res = model('common/cart', 'service')->addFood($data);
-                model('common/cart', 'service')->notifyCart($server, $data['store_code'], $data['table_id']);
+                $res = $cartService->addFood($data);
+                $cartService->notifyCart($server, $data['store_code'], $data['table_id']);
+//                $cartService->notifyMessage($server, $data['store_code'], $data['table_id']);
                 break;
             case 'food_del':
-                $res = model('common/cart', 'service')->delFood($data);
-                model('common/cart', 'service')->notifyCart($server, $data['store_code'], $data['table_id']);
+                $res = $cartService->delFood($data);
+                $cartService->notifyCart($server, $data['store_code'], $data['table_id']);
                 break;
             case 'init_table':
-                $res = model('common/cart', 'service')->addUserToTable($data, $fd);
+                $res = $cartService->addUserToTable($data, $fd);
+//                $cartService->notifyMessage($server, $data['store_code'], $data['table_id']);
                 break;
         }
 

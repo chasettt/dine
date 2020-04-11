@@ -1,4 +1,5 @@
 <?php
+
 namespace app\api\controller;
 
 use lib\Redis;
@@ -18,35 +19,23 @@ class Classes extends Base
      */
     public function getFoodList()
     {
-        // 门店ID
-        $storeCode   = input('post.store_code', 0, 'int');
-        $tableId     = input('post.table_id', 0, 'int');
-        $environment = input('post.environment', '', 'string');
+        $storeCode = input('post.store_code', 0, 'int');
 
-        if (! $storeCode) {
+        if (!$storeCode) {
             return $this->returnMsg(0, '参数错误');
         }
 
-        // 菜品列表
         $menuInfo = $this->getRedis()->get(config('cache_keys.store_menu') . ":{$storeCode}");
 
         if (false == $menuInfo or empty($menuInfo)) {
             return $this->returnMsg(200, 'success', []);
         }
 
-        // 用户卡号 2019.7.15注释，已经没有按卡号店长推荐了
-//        $cno = $this->getRedis()->get(config('cache_keys.user_cno') . ":{$this->openid}");
-
         // 估清
         $estimatesArr = $this->getRedis()->get(config('cache_keys.choice_estimates') . ":{$storeCode}");
 
-        // 台位信息
-        if (! empty($tableId)) {
-            $tableInfo = $this->getRedis()->get(config('cache_keys.table_info') . ":{$storeCode}:{$tableId}");
-        }
-
         foreach ($menuInfo as $keys => &$info) {
-            if (isset($info['food_list']) and ! empty($info['food_list'])) {
+            if (isset($info['food_list']) and !empty($info['food_list'])) {
 
                 $foodList = $info['food_list'];
 
@@ -84,13 +73,6 @@ class Classes extends Base
                             }
                         }
                     }
-
-                    if (! empty($tableInfo) and $tableInfo['type_id'] == config('room.type')) {
-                        $food['food_price']        = $food['food_room_price'];
-                        $food['food_member_price'] = $food['food_room_member_price'];
-                        unset($food['food_room_price']);
-                        unset($food['food_room_member_price']);
-                    }
                 }
 
                 $info['food_list'] = $foodList;
@@ -104,9 +86,9 @@ class Classes extends Base
 
     public function getlist()
     {
-        $storeCode   = input('post.store_code', 0, 'int');
+        $storeCode = input('post.store_code', 0, 'int');
 
-        if (! $storeCode) {
+        if (!$storeCode) {
             return $this->returnMsg(0, '参数错误');
         }
 

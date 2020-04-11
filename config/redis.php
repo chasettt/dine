@@ -9,7 +9,7 @@
 return [
     'db'          => 1,
     'prefix'      => 'online',
-    'host'        => \think\Env::get('redis.host'),
+    'host'        => think\Facade\Env::get('redis.host'),
     'port'        => 6379,
     'password'    => '',
     'rule'        => true,

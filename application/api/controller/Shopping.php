@@ -2,6 +2,8 @@
 
 namespace app\api\controller;
 
+use app\common\service\shopping as ShoppingService;
+
 /**
  * 购物车
  * Class Reserve
@@ -26,7 +28,7 @@ class Shopping extends Base
         }
 
         $result          = [];
-        $shoppingService = model('common/shopping', 'service');
+        $shoppingService = new ShoppingService();
         switch ($param) {
             case 'users':
                 if (!$param or !$storeId) {

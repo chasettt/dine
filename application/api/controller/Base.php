@@ -33,7 +33,7 @@ class Base extends \think\Controller
          * 授权认证
          */
         if (true === $this->auth) {
-            $token = input('get.token', '');
+            $token = $this->request->header('token');
 
             if (!$token) {
                 $this->result([], -1, '授权失败');
@@ -45,9 +45,10 @@ class Base extends \think\Controller
                 $this->result([], -1, '授权失败');
             }
 
-            $this->openid  = $login['openid'];
-            $this->unionid = $login['unionid'];
-            $this->brandid = $login['brand_id'];
+            $this->openid   = $login['openid'];
+            $this->unionid  = $login['unionid'];
+            $this->brandid  = $login['brand_id'];
+            $this->nickname = $login['nickname'];
         }
     }
 
@@ -93,9 +94,9 @@ class Base extends \think\Controller
      */
     public function returnMsg($code = 0, $message = 'error', $data = [])
     {
-//        header('Access-Control-Allow-Origin: *');
-//        header("Access-Control-Allow-Headers: Origin, X-Requested-With, Content-Type, Accept");
-//        header('Access-Control-Allow-Methods: GET, POST');
+        //        header('Access-Control-Allow-Origin: *');
+        //        header("Access-Control-Allow-Headers: Origin, X-Requested-With, Content-Type, Accept");
+        //        header('Access-Control-Allow-Methods: GET, POST');
 
         return json(['code' => $code, 'msg' => $message, 'data' => $data]);
     }

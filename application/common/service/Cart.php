@@ -38,7 +38,7 @@ class Cart extends Base
             return $this->returnMsg(0, '请求参数错误');
         }
 
-        $shoppingService = model('common/shopping', 'service');
+        $shoppingService = new Shopping();
         switch ($param) {
             case 'users':
                 if (!$source or !$foodCode or !$foodNumber or !$storeId) {
@@ -136,16 +136,36 @@ class Cart extends Base
 
     public function notifyCart($server, $storeId, $tableNo)
     {
-        $this->getRedis()->select(0);
-        $connections = $this->getRedis()->hGetAll(config('cache_keys.con_table_user') . ":{$storeId}:{$tableNo}");
+        go(function () use ($server, $storeId, $tableNo) {
+            $this->getRedis()->select(0);
+            $connections = $this->getRedis()->hGetAll(config('cache_keys.con_table_user') . ":{$storeId}:{$tableNo}");
 
-        $list = model('common/shopping', 'service')->getTableUserCart($storeId, $tableNo, $this->openid);
+            $shoppingService = new Shopping();
+            $list = $shoppingService->getTableUserCart($storeId, $tableNo, $this->openid);
 
-        if (!empty($connections)) {
-            foreach ($connections as $conn) {
-                $server->push($conn, json_encode($this->returnMsg(200, 'success', $list, 'food_notify')));
+            if (!empty($connections)) {
+                foreach ($connections as $conn) {
+                    $server->push($conn, json_encode($this->returnMsg(200, 'success', $list, 'food_notify')));
+                }
             }
-        }
+        });
         return true;
     }
+
+//    public function notifyMessage($server, $storeId, $tableNo)
+//    {
+//        go(function () use ($server, $storeId, $tableNo) {
+//            $this->getRedis()->select(0);
+//            $connections = $this->getRedis()->hGetAll(config('cache_keys.con_table_user') . ":{$storeId}:{$tableNo}");
+//
+//            $nickname = (new Shopping())->nickname;
+//            if (!empty($connections)) {
+//                foreach ($connections as $conn) {
+//                    $server->push($conn, json_encode($this->returnMsg(200, 'success', $nickname . '加了1份菜', 'message_notify')));
+//                }
+//            }
+//        });
+//
+//        return true;
+//    }
 }

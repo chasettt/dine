@@ -8,11 +8,11 @@
 
 namespace app\online\controller;
 
-use Psr\Log\Test\DummyTest;
 use think\Controller;
 use think\Facade\Request;
 use lib\Redis;
-
+use app\common\service\Oauth;
+use \Firebase\JWT\JWT;
 
 /**
  * Class Base
@@ -51,36 +51,26 @@ class Base extends Controller
                 if (!$token) {
                     $token = $this->getToken($userId);
                 } else {
-                    $check = model('common/oauth', 'service')->check($token, $brandId, true);
+                    $oauth = new Oauth();
+                    $check = $oauth->check($token, $brandId, true);
 
                     if (!$check) {
                         $token = $this->getToken($userId);
                     }
                 }
 
-                $redirectUrl = Request::server('REQUEST_URI') . '?' . Request::server('QUERY_STRING') . '&token=' . $token;
-                $this->redirect($redirectUrl);
+                header("token:{$token}");
+//                $redirectUrl = Request::server('REQUEST_URI') . '?'
+//                    . Request::server('QUERY_STRING') . '&token=' . $token;
+//                $this->redirect($redirectUrl);
             } else {
                 $token = input('get.token');
-                cookie(config('cache_keys.oauth_token'), $token, config('cache_keys.token_cache_time'));
             }
+            cookie(config('cache_keys.oauth_token'), $token, config('cache_keys.token_cache_time'));
+
         }
     }
 
-    private function getReturnUrl($url, $param)
-    {
-        $query      = parse_url($url, PHP_URL_QUERY);
-        $buildQuery = http_build_query($param);
-
-        if (! is_null($query)) {
-            $url .= '&' . $buildQuery;
-        } else {
-            $url .= '?' . $buildQuery;
-        }
-
-        return $url;
-
-    }
 
     public function fail($title = '', $description = '', $btn = '')
     {
@@ -121,7 +111,8 @@ class Base extends Controller
         $memberInfo = model('common/users')->getUserInfo(['wechat_id' => $userId], $field);
 
         if (!empty($memberInfo)) {
-            $token = strtoupper(md5($memberInfo['wechat_openid'] . time()));
+//            $token = strtoupper(md5($memberInfo['wechat_openid'] . time()));
+            $token = $this->getJwtToken($memberInfo['wechat_openid']);
             $this->getRedis()->set(
                 config('cache_keys.oauth_token') . ":{$token}",
                 [
@@ -141,6 +132,21 @@ class Base extends Controller
             );
         }
         return $token;
+    }
+
+    public function getJwtToken($openid)
+    {
+        $key     = config('jwt.key');
+        $jwtData = [
+            'lat'    => config('jwt.lat'),
+            'nbf'    => config('jwt.nbf'),
+            'exp'    => config('jwt.exp'),
+            'openid' => $openid, //可以加入自己想要获得的用户信息参数
+        ];
+
+        $jwtToken = JWT::encode($jwtData, $key);
+
+        return $jwtToken;
     }
 
     /**

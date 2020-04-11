@@ -9,6 +9,7 @@
 namespace app\common\service;
 
 use lib\Redis;
+use \Firebase\JWT\JWT;
 
 class Base
 {
@@ -24,9 +25,18 @@ class Base
             return false;
         }
 
+        $this->checkJwtToken($token);
         $this->openid  = $login['openid'];
         $this->unionid = $login['unionid'];
         $this->brandid = $login['brand_id'];
+    }
+
+    public function checkJwtToken($token)
+    {
+        $key  = config('jwt.key');
+        $info = JWT::decode($token, $key,['HS256']);
+        dump($info);
+        return $info;
     }
 
     /**

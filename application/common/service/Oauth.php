@@ -23,6 +23,7 @@ class Oauth
             session('users.openid', $oath['openid']);
             session('users.unionid', $oath['unionid']);
             session('users.brand_id', $oath['brand_id']);
+            session('users.nickname', $oath['nickname']);
         }
 
         return $oath;
